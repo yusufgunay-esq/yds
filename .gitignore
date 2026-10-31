@@ -1,0 +1,39 @@
+# ==============================================================================
+# YDS GÜVENLİK VE GİT SÜZGEÇ DOSYASI (.gitignore)
+# ==============================================================================
+
+# --- 1. GİZLİ KİMLİK BİLGİLERİ VE TOKENLAR ---
+client_secret.json
+.tokens.json
+sync.log
+.pushed_studio_sessions.json
+.env
+*.env
+*.pem
+*.key
+github_token.txt
+
+# --- 2. KİŞİSEL ÇALIŞMA KAYITLARI VE SEANSLAR ---
+studio_sessions_export.json
+*.session.json
+uploads/
+ocr_results.json
+task_history.json
+yds_vault.json
+yds_data.json
+
+# --- 3. YEDEK VE GEÇİCİ DOSYALAR ---
+*.bak*
+*.tmp
+scans/
+archive/
+
+# --- 4. SİSTEM VE DERLEME DOSYALARI ---
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+log/
+*.log
+.DS_Store
+Thumbs.db

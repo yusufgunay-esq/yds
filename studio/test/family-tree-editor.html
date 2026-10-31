@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<!--
+  family-tree-editor.html — SANDBOX: soy ağacı düğüm editörü.
+  Amaç: `family_tree` verisi (nodes/unions) yazarken x,y yüzdelerini elle tahmin
+  etmek yerine, düğümlere KUŞAK (gen) numarası vererek OTOMATİK yerleşim almak;
+  gerektiğinde tek tek düğümü sürükleyip manuel kilitlemek. Motoru
+  (js/visual-engines-v3.js) DEĞİŞTİRMEZ, sadece onu kullanır.
+
+  26 Tem, 2. tur: elle x/y tahmini "karışık" görünüme yol açtığı için birincil
+  akış artık `gen` (kuşak no) — üstsoy negatif, mirasbırakan kuşağı 0, altsoy
+  pozitif. Sağdaki taslak sahne bu kuşaklara göre otomatik kabaca yerleşir;
+  bir düğümü sürüklersen o düğüm "kilitlenir" (x/y JSON'a yazılır, gen görmezden
+  gelinir) — tıpkı gerçek motorun davranışı gibi. "Canlı motor önizlemesi"
+  panelindeki görünüm HER ZAMAN gerçek motorun (aynı algoritma) çizdiğidir;
+  taslak sahne sadece kaba bir düzenleme yardımcısıdır.
+
+  Kullanım: baslat.bat çalışırken tarayıcıda aç:
+  http://localhost:8765/studio/test/family-tree-editor.html
+
+  Akış:
+  1) Solda düğüm listesi — kişi ekle, kuşak no (gen) ver.
+  2) Sağdaki taslak sahnede düğümü sürüklersen manuel kilitlenir; "🔓 Otomatiğe
+     döndür" ile tekrar kuşağa göre otomatik yerleşime bırakılır.
+  3) "Birlik ekle" ile evlilik/evlilik dışı ilişki/boşanmış + ebeveyn-çocuk
+     bağları kurulur.
+  4) Alttaki "JSON çıktısı" kutusu, doğrudan topics.js'teki `visualData.cases[i]`
+     içine yapıştırılabilir.
+-->
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sandbox · Soy Ağacı Editörü</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background:#FAF9F6; color:#18181B; margin:0; padding:2rem 1.5rem 4rem; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 1.3rem; margin-bottom:.2rem; }
+  p.sub { color:#6B6B72; font-size:.9rem; margin-bottom:1.5rem; max-width:70ch; line-height:1.55; }
+  .layout { display:grid; grid-template-columns: 360px 1fr; gap:1.4rem; align-items:start; }
+  .panel { background:#fff; border:1px solid rgba(24,24,27,.1); border-radius:16px; padding:1.2rem; box-shadow:0 1px 2px rgba(24,24,27,.04),0 8px 24px rgba(24,24,27,.05); }
+  .panel h2 { font-size:.95rem; margin:0 0 .8rem; }
+  .field { margin-bottom:.6rem; display:flex; flex-direction:column; gap:.25rem; }
+  .field label { font-size:.72rem; font-weight:600; color:#6B6B72; text-transform:uppercase; letter-spacing:.02em; }
+  .field input, .field select, .field textarea { font:inherit; font-size:.85rem; padding:.45rem .55rem; border:1px solid rgba(24,24,27,.16); border-radius:8px; background:#FAFAF8; }
+  .field textarea { resize:vertical; min-height:2.4em; }
+  .row2 { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+  .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.5rem; }
+  button.btn { font:inherit; font-size:.82rem; font-weight:600; padding:.5rem .9rem; border-radius:999px; border:1px solid rgba(24,24,27,.16); background:#fff; cursor:pointer; }
+  button.btn.primary { background:#5B5BD6; color:#fff; border-color:#5B5BD6; }
+  button.btn.danger { color:#C4362F; border-color:rgba(196,54,47,.4); }
+  button.btn.small { padding:.3rem .6rem; font-size:.72rem; }
+  .node-item { border:1px solid rgba(24,24,27,.1); border-radius:10px; padding:.6rem .7rem; margin-bottom:.5rem; font-size:.82rem; }
+  .node-item .top { display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.4rem; }
+  .node-item .top b { font-size:.85rem; }
+  .lockrow { display:flex; align-items:center; justify-content:space-between; gap:.4rem; margin-top:.4rem; font-size:.75rem; color:#6B6B72; }
+  .stage-outer { position:relative; height:520px; background:
+      radial-gradient(circle at 1px 1px, rgba(24,24,27,.13) 1px, transparent 0) 0 0/22px 22px, #FAFAF8;
+    border:1px solid rgba(24,24,27,.1); border-radius:16px; overflow:hidden; }
+  /* ÇAPA KURALI: (x,y) şeklin merkezi (44px şekil → -22px), kutunun merkezi DEĞİL —
+     yoksa etiket yüksekliği şekli kaydırır ve çizgiler boşluğa bağlanır. */
+  .stage-node { position:absolute; transform:translate(-50%,-22px); width:100px; text-align:center; cursor:grab; user-select:none; }
+  .stage-node:active { cursor:grabbing; }
+  .stage-node .shape { width:44px; height:44px; margin:0 auto 4px; border-radius:50%; background:#fff; border:2.5px solid #18181B; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .stage-node.m .shape { border-radius:0; clip-path:polygon(50% 4%,4% 96%,96% 96%); background:#18181B; color:#fff; border:none; }
+  .stage-node.mb .shape { background:#5B5BD6; border-color:#5B5BD6; color:#fff; }
+  .stage-node.dead .shape { position:relative; }
+  .stage-node.dead .shape::after { content:''; position:absolute; left:-6px; right:-6px; top:50%; height:2px; background:#E5484D; transform:rotate(-30deg); }
+  .stage-node .lbl { font-size:11.5px; font-weight:600; background:#fff; border-radius:6px; padding:1px 4px; display:inline-block; }
+  .stage-node .lockbadge { font-size:9px; color:#B45309; font-weight:700; }
+  .coords { font-size:10px; color:#A1A1A8; margin-top:2px; }
+  .union-item { display:flex; gap:.4rem; align-items:center; flex-wrap:wrap; font-size:.78rem; border:1px solid rgba(24,24,27,.1); border-radius:8px; padding:.5rem .6rem; margin-bottom:.5rem; }
+  textarea#jsonOut { width:100%; min-height:260px; font-family:'SF Mono',Menlo,monospace; font-size:.78rem; line-height:1.5; }
+  .preview-wrap { margin-top:1.4rem; }
+  .toolbar { display:flex; gap:.5rem; margin-bottom:.8rem; flex-wrap:wrap; }
+  .hint { font-size:.75rem; color:#6B6B72; margin:-.4rem 0 .8rem; line-height:1.5; }
+  .warn-box { background:#FEF3F2; border:1px solid rgba(229,72,77,.35); border-radius:12px; padding:.7rem .9rem; margin-bottom:1rem; }
+  .warn-box h3 { margin:0 0 .4rem; font-size:.82rem; color:#B42318; }
+  .warn-box ul { margin:0; padding-left:1.1rem; font-size:.78rem; line-height:1.55; color:#7A2E27; }
+  .warn-box.ok { background:#F0FDF4; border-color:rgba(22,163,74,.3); }
+  .warn-box.ok h3 { color:#166534; }
+  .node-item.warn, .union-item.warn { border-color:#E5484D; box-shadow:0 0 0 1px rgba(229,72,77,.25); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sandbox: Soy Ağacı Düğüm Editörü</h1>
+  <p class="sub">Düğümlere x,y tahmin etmek yerine <b>kuşak no (gen)</b> ver — üstsoy negatif, mirasbırakan kuşağı 0, altsoy pozitif. Yerleşim otomatik hesaplanır. Bir düğümü sağdaki taslak sahnede sürüklersen o düğüm manuel kilitlenir. Alttaki JSON'u doğrudan <code>topics.js</code>'teki <code>visualData.cases[i]</code> içine yapıştır.</p>
+
+  <div class="layout">
+    <div class="panel">
+      <h2>Düğümler</h2>
+      <div id="nodeList"></div>
+      <button class="btn primary" id="addNode" style="width:100%">+ Düğüm ekle</button>
+
+      <h2 style="margin-top:1.2rem">Birlikler (unions)</h2>
+      <div class="hint">Evlilik = çift çizgi · Evlilik dışı ilişki = kesikli çizgi (çocuğun mirasçılığı EŞİT, sadece ebeveyn bağı farklı stilde) · Boşanmış = çift çizgi + ✕</div>
+      <div id="unionList"></div>
+      <button class="btn" id="addUnion" style="width:100%">+ Birlik ekle</button>
+
+      <h2 style="margin-top:1.2rem">Kural cümlesi</h2>
+      <div class="field"><textarea id="lawText" placeholder="TMK m.xxx'e göre...">Sağ kalan eş, 1. zümre ile birlikte mirasçı olduğunda 1/4 alır (TMK m.499).</textarea></div>
+    </div>
+
+    <div>
+      <div class="toolbar">
+        <button class="btn" id="loadSample">Örnek veri yükle</button>
+        <button class="btn danger" id="clearAll">Temizle</button>
+      </div>
+      <div class="panel">
+        <h2>Taslak sahne (kuşağa göre otomatik — sürükleyince kilitlenir)</h2>
+        <div class="stage-outer" id="stageOuter"></div>
+      </div>
+
+      <div class="preview-wrap panel">
+        <h2>Canlı motor önizlemesi (gerçek family_tree render'ı)</h2>
+        <div id="warnBox"></div>
+        <div id="livePreview"></div>
+      </div>
+
+      <div class="panel" style="margin-top:1.4rem">
+        <h2>JSON çıktısı</h2>
+        <textarea id="jsonOut" readonly></textarea>
+        <button class="btn" id="copyJson" style="margin-top:.6rem">Panoya kopyala</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../js/visual-engines-v3.js"></script>
+<script>
+(function(){
+  let nodes = [];
+  let unions = [];
+  let nid = 1;
+  let warnState = { nodeIds: new Set(), unionIdxs: new Set(), messages: [] };
+
+  /** 29 Tem eklendi: bu editörde tekrar tekrar aynı hata yapılıyordu — kardeşler yanlışlıkla
+      bir birliğin "Eş(ler)" kutusuna konuyor (mirasbırakan → çocuklar bağı hiç kurulmuyor,
+      kardeşler birbirine "evli" gibi çiziliyor) ve/veya alt kuşak (torunlar) hiçbir birliğin
+      "Çocuklar" kutusuna eklenmiyor, o yüzden hiç çizgisi olmadan boşlukta kalıyor. Motor bunu
+      SESSİZCE yanlış/eksik çizer — hata JSON çıkana kadar fark edilmez. Bu fonksiyon canlı
+      önizlemenin üstüne kırmızı bir uyarı kutusu basar ve ilgili düğüm/birlik kartlarını
+      kırmızı çerçeveler, ki yanlış veri "Canlı motor önizlemesi"ne gitmeden fark edilsin. */
+  function computeWarnings() {
+    const byId = {}; nodes.forEach(n => byId[n.id] = n);
+    const isChild = new Set();
+    unions.forEach(u => (u.children || []).forEach(id => isChild.add(id)));
+    const gens = nodes.map(n => n.gen || 0);
+    const minGen = gens.length ? Math.min(...gens) : 0;
+    const nodeIds = new Set(); const unionIdxs = new Set(); const messages = [];
+
+    // 1) Mirasbırakan kuşağı üstünde olup (gen > minGen) hiçbir birliğin çocuğu olmayan düğüm —
+    //    bir üst kuşağa hiç bağlanmayacak demektir.
+    nodes.forEach(n => {
+      if ((n.gen || 0) > minGen && !isChild.has(n.id)) {
+        nodeIds.add(n.id);
+        messages.push(`<b>${esc(n.label || n.id)}</b> (kuşak ${n.gen}) hiçbir birlikte "Çocuklar" olarak seçilmemiş — üst kuşağa çizgisi olmayacak. Onu bir ebeveyninin (veya mirasbırakanın) birliğinde "Çocuklar" kutusuna ekle.`);
+      }
+    });
+
+    // 2) İkiden fazla "Eş(ler)" seçilmiş birlik — evlilik/ilişki türü ikili olur, 3+ partner
+    //    genelde kardeşlerin yanlışlıkla buraya konduğunu gösterir.
+    unions.forEach((u, i) => {
+      const partners = (u.partners || []);
+      if (partners.length > 2) {
+        unionIdxs.add(i);
+        const names = partners.map(id => byId[id] ? byId[id].label : id).join(', ');
+        messages.push(`Birlik #${i + 1}: "Eş(ler)" kutusunda ${partners.length} kişi var (${esc(names)}) — bir birlikte en fazla 2 eş olur. Muhtemelen bunlar kardeş; ortak ebeveyni (veya mirasbırakanı) "Eş(ler)"e, bu kişileri "Çocuklar"a taşı.`);
+      }
+    });
+
+    // 3) Aynı kişi bir birlikte hem "Eş" hem "Çocuk" olamaz.
+    unions.forEach((u, i) => {
+      const overlap = (u.partners || []).filter(id => (u.children || []).includes(id));
+      if (overlap.length) {
+        unionIdxs.add(i);
+        const names = overlap.map(id => byId[id] ? byId[id].label : id).join(', ');
+        messages.push(`Birlik #${i + 1}: ${esc(names)} hem "Eş(ler)" hem "Çocuklar" kutusunda seçili — bir kişi aynı birlikte ikisi birden olamaz.`);
+      }
+    });
+
+    // 4) Çocuk olarak seçilen düğümün kuşağı, ebeveyn(ler)inin kuşağından büyük değilse
+    //    (aynı veya daha küçükse) altsoy yönü tersine dönmüş demektir.
+    unions.forEach((u, i) => {
+      const partners = (u.partners || []).map(id => byId[id]).filter(Boolean);
+      if (!partners.length) return;
+      const maxParentGen = Math.max(...partners.map(p => p.gen || 0));
+      (u.children || []).forEach(id => {
+        const c = byId[id];
+        if (c && (c.gen || 0) <= maxParentGen) {
+          unionIdxs.add(i); nodeIds.add(id);
+          messages.push(`Birlik #${i + 1}: "Çocuk" olarak seçilen <b>${esc(c.label)}</b>'nin kuşak no'su (${c.gen}), ebeveyninkinden (${maxParentGen}) büyük değil — altsoy kuşak numarası daha büyük olmalı.`);
+        }
+      });
+    });
+
+    warnState = { nodeIds, unionIdxs, messages };
+    return warnState;
+  }
+
+  function warnBoxHTML() {
+    if (!warnState.messages.length) {
+      return `<div class="warn-box ok"><h3>✓ Bağlantı denetimi geçti</h3><ul><li>Her altsoy düğümü bir birliğin "Çocuklar"ında, birlikler tutarlı.</li></ul></div>`;
+    }
+    return `<div class="warn-box"><h3>⚠ ${warnState.messages.length} bağlantı sorunu — önizlemedeki çizgiler bunlardan dolayı eksik/yanlış olabilir</h3><ul>${warnState.messages.map(m => `<li>${m}</li>`).join('')}</ul></div>`;
+  }
+
+  function newNode(over) {
+    return Object.assign({
+      id: 'n' + (nid++),
+      label: 'Kişi',
+      subLabel: '',
+      gender: 'm',
+      role: '',
+      dead: false,
+      heir: true,
+      sub: '',
+      reserved: '',
+      reason: '',
+      gen: 0,
+      locked: false,
+      x: undefined, y: undefined
+    }, over || {});
+  }
+
+  function sample() {
+    nodes = [
+      newNode({ id:'mb', label:'Mirasbırakan', role:'mirasbirakan', gen:0 }),
+      newNode({ id:'es', label:'Ayşe', subLabel:'eş', gender:'f', sub:'1/4', reserved:'1/4', reason:"Eş, 1. zümreyle birlikte 1/4 alır (TMK m.499).", gen:0 }),
+      newNode({ id:'ali', label:'Ali', subLabel:'oğul', gender:'m', sub:'3/8', reserved:'3/16', reason:"Kalan 3/4, altsoy arasında eşit paylaşılır (TMK m.500).", gen:1 }),
+      newNode({ id:'mehmet', label:'Mehmet', subLabel:'oğul', gender:'m', sub:'3/8', reserved:'3/16', reason:"Kalan 3/4, altsoy arasında eşit paylaşılır (TMK m.500).", gen:1 })
+    ];
+    unions = [ { partners:['mb','es'], type:'marriage', children:['ali','mehmet'] } ];
+    render();
+  }
+
+  function addNode() { nodes.push(newNode({ gen: 0 })); render(); }
+  function addUnion() { unions.push({ partners: [], children: [], type: 'marriage' }); render(); }
+
+  function nodeListHTML() {
+    return nodes.map((n, i) => `
+      <div class="node-item ${warnState.nodeIds.has(n.id) ? 'warn' : ''}" data-idx="${i}">
+        <div class="top"><b>${n.label || '(isimsiz)'}</b><button class="btn danger" data-del="${i}">Sil</button></div>
+        <div class="field"><label>Etiket</label><input data-f="label" data-idx="${i}" value="${esc(n.label)}"></div>
+        <div class="field"><label>Alt etiket</label><input data-f="subLabel" data-idx="${i}" value="${esc(n.subLabel)}"></div>
+        <div class="row3">
+          <div class="field"><label>Cinsiyet</label>
+            <select data-f="gender" data-idx="${i}">
+              <option value="m" ${n.gender==='m'?'selected':''}>Erkek</option>
+              <option value="f" ${n.gender==='f'?'selected':''}>Kadın</option>
+            </select>
+          </div>
+          <div class="field"><label>Rol</label>
+            <select data-f="role" data-idx="${i}">
+              <option value="" ${!n.role?'selected':''}>—</option>
+              <option value="mirasbirakan" ${n.role==='mirasbirakan'?'selected':''}>Mirasbırakan</option>
+            </select>
+          </div>
+          <div class="field"><label>Kuşak (gen)</label><input type="number" data-f="gen" data-idx="${i}" value="${n.gen}" step="1" ${n.locked?'disabled':''}></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label><input type="checkbox" data-f="dead" data-idx="${i}" ${n.dead?'checked':''}> Önce vefat</label></div>
+          <div class="field"><label><input type="checkbox" data-f="heir" data-idx="${i}" ${n.heir?'checked':''}> Tabloda mirasçı</label></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Pay (sub)</label><input data-f="sub" data-idx="${i}" value="${esc(n.sub)}" placeholder="ör. 3/8"></div>
+          <div class="field"><label>Saklı pay</label><input data-f="reserved" data-idx="${i}" value="${esc(n.reserved)}" placeholder="ör. 3/16"></div>
+        </div>
+        <div class="field"><label>Gerekçe</label><textarea data-f="reason" data-idx="${i}">${esc(n.reason)}</textarea></div>
+        <div class="lockrow">
+          <span>${n.locked ? `🔒 manuel konumlandı (x:${(n.x||0).toFixed(1)} y:${(n.y||0).toFixed(1)})` : '🔓 otomatik (kuşağa göre)'}</span>
+          ${n.locked ? `<button class="btn small" data-unlock="${i}">Otomatiğe döndür</button>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  function unionListHTML() {
+    return unions.map((u, i) => `
+      <div class="union-item ${warnState.unionIdxs.has(i) ? 'warn' : ''}" data-uidx="${i}">
+        <div style="width:100%;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <span>Tür:</span>
+          <select data-uf="type" data-uidx="${i}">
+            <option value="marriage" ${(!u.type||u.type==='marriage')?'selected':''}>Evlilik</option>
+            <option value="informal" ${u.type==='informal'?'selected':''}>Evlilik dışı ilişki</option>
+            <option value="divorced" ${u.type==='divorced'?'selected':''}>Boşanmış</option>
+          </select>
+          <button class="btn danger small" data-udel="${i}" style="margin-left:auto">Sil</button>
+        </div>
+        <span>Eş(ler) — <i>SADECE mirasbırakan/ebeveyn(ler), en fazla 2:</i></span>
+        <select multiple data-uf="partners" data-uidx="${i}" size="2" style="min-width:110px">${nodes.map(n=>`<option value="${n.id}" ${u.partners.includes(n.id)?'selected':''}>${n.label}</option>`).join('')}</select>
+        <span>Çocuklar — <i>bu birliğin altsoyu (kardeşler DAHİL buraya):</i></span>
+        <select multiple data-uf="children" data-uidx="${i}" size="2" style="min-width:110px">${nodes.map(n=>`<option value="${n.id}" ${u.children.includes(n.id)?'selected':''}>${n.label}</option>`).join('')}</select>
+      </div>`).join('');
+  }
+
+  function esc(s) { return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  /** Motordaki chainOrder'ın aynısı: bir kişinin iki partneri varsa (ör. resmi eş + evlilik dışı
+      ilişki) o kişi ortada kalır, çizgi üçüncü kişinin üstünden geçmez. */
+  function chainOrder(seedIds, unions) {
+    const idSet = new Set(seedIds);
+    const adj = {}; seedIds.forEach(id => { adj[id] = []; });
+    unions.forEach(u => {
+      const ps = (u.partners || []).filter(id => idSet.has(id));
+      for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) {
+        adj[ps[i]].push(ps[j]); adj[ps[j]].push(ps[i]);
+      }
+    });
+    const visited = new Set(); const order = [];
+    function walk(start) {
+      let cur = start;
+      while (cur !== undefined && !visited.has(cur)) {
+        visited.add(cur); order.push(cur);
+        cur = (adj[cur] || []).find(n => !visited.has(n));
+      }
+    }
+    seedIds.filter(id => (adj[id] || []).length <= 1).forEach(id => { if (!visited.has(id)) walk(id); });
+    seedIds.forEach(id => { if (!visited.has(id)) walk(id); });
+    return order;
+  }
+
+  /** Taslak sahne için basit kuşak-bazlı yerleşim — gerçek motorun algoritmasının küçük bir kopyası.
+      Sadece editing yardımcısıdır; doğruluk kaynağı "canlı motor önizlemesi"dir. */
+  function quickAutoXY() {
+    const auto = nodes.filter(n => !n.locked);
+    if (!auto.length) return;
+    auto.forEach(n => { n.x = undefined; });
+    const gens = [...new Set(auto.map(n => n.gen || 0))].sort((a, b) => a - b);
+    const yFor = g => gens.length === 1 ? 50 : 13 + gens.indexOf(g) / (gens.length - 1) * 76;
+    auto.forEach(n => { n.y = yFor(n.gen || 0); });
+    const byId = {}; nodes.forEach(n => byId[n.id] = n);
+    const byGen = {}; auto.forEach(n => { (byGen[n.gen || 0] = byGen[n.gen || 0] || []).push(n); });
+    const isChild = new Set(); unions.forEach(u => (u.children || []).forEach(id => isChild.add(id)));
+    gens.forEach(g => {
+      const seeds = byGen[g].filter(n => !isChild.has(n.id));
+      const seedIds = seeds.map(n => n.id);
+      const ordered = chainOrder(seedIds, unions);
+      const k = ordered.length;
+      ordered.forEach((id, i) => { byId[id].x = k === 1 ? 50 : 12 + (i / (k - 1)) * 76; });
+    });
+    for (let p = 0; p < 6; p++) {
+      let prog = false;
+      unions.forEach(u => {
+        const partners = (u.partners || []).map(id => byId[id]).filter(Boolean);
+        const children = (u.children || []).map(id => byId[id]).filter(Boolean);
+        if (!partners.length || partners.some(pp => pp.x === undefined)) return;
+        const midX = partners.reduce((s, pp) => s + pp.x, 0) / partners.length;
+        const n = children.length, gap = 15;
+        children.forEach((c, i) => {
+          if (c.locked) return;
+          if (c.x === undefined) { c.x = midX + (i - (n - 1) / 2) * gap; prog = true; }
+        });
+      });
+      if (!prog) break;
+    }
+    gens.forEach(g => {
+      const missing = byGen[g].filter(n => n.x === undefined);
+      const k = missing.length;
+      missing.forEach((n, i) => { n.x = k === 1 ? 50 : 20 + (i / (k - 1)) * 60; });
+    });
+    gens.forEach(g => {
+      const row = byGen[g].slice().sort((a, b) => a.x - b.x);
+      const minGap = 13;
+      for (let i = 1; i < row.length; i++) { if (row[i].x - row[i - 1].x < minGap) row[i].x = row[i - 1].x + minGap; }
+      if (row.length) {
+        const lo = row[0].x, hi = row[row.length - 1].x, w = hi - lo;
+        const targetLo = w <= 86 ? 7 + (86 - w) / 2 : 7;
+        const shift = targetLo - lo;
+        row.forEach(n => { n.x = Math.max(4, Math.min(96, n.x + shift)); });
+      }
+    });
+  }
+
+  /** Motorla aynı mantık: tek düz çizgi = evli, tek kesikli çizgi = evlilik dışı ilişki,
+      düz çizgi + ✕ = boşanmış. Gerçek piksel boyutuyla ölçülür (aynı bug'a düşmemek için). */
+  function stageLinesSvg(outer) {
+    const rect = outer.getBoundingClientRect();
+    const W = rect.width > 20 ? rect.width : 800;
+    const H = rect.height > 20 ? rect.height : 520;
+    const byId = {}; nodes.forEach(n => byId[n.id] = n);
+    const px = (xp, yp) => [xp / 100 * W, yp / 100 * H];
+    const segs = [];
+    unions.forEach(u => {
+      const partners = (u.partners || []).map(id => byId[id]).filter(Boolean);
+      const children = (u.children || []).map(id => byId[id]).filter(Boolean);
+      if (!partners.length) return;
+      const type = u.type || 'marriage';
+      let stemXp, stemYp;
+      if (partners.length === 2) {
+        const [p1, p2] = partners;
+        const [x1, y1] = px(p1.x, p1.y), [x2, y2] = px(p2.x, p2.y);
+        segs.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#18181B" stroke-opacity=".7" stroke-width="2" ${type==='informal'?'stroke-dasharray="7 6"':''} />`);
+        if (type === 'divorced') segs.push(`<text x="${(x1+x2)/2}" y="${(y1+y2)/2+5}" text-anchor="middle" font-size="14" font-weight="700" fill="#E5484D">✕</text>`);
+        stemXp = (p1.x + p2.x) / 2; stemYp = (p1.y + p2.y) / 2;
+      } else { stemXp = partners[0].x; stemYp = partners[0].y; }
+      if (!children.length) return;
+      // Çapa kuralı: ofset yok — çizgi çapadan çapaya, şekil çizginin üstünde render olur.
+      const [stemX, stemY] = px(stemXp, stemYp);
+      const topChildYp = Math.min(...children.map(c => c.y));
+      const barYp = stemYp + (topChildYp - stemYp) * 0.55;
+      const barY = barYp / 100 * H;
+      segs.push(`<line x1="${stemX}" y1="${stemY}" x2="${stemX}" y2="${barY}" stroke="#18181B" stroke-opacity=".7" stroke-width="2" />`);
+      const xs = children.map(c => c.x / 100 * W);
+      segs.push(`<line x1="${Math.min(...xs)}" y1="${barY}" x2="${Math.max(...xs)}" y2="${barY}" stroke="#18181B" stroke-opacity=".7" stroke-width="2" />`);
+      children.forEach(c => { const [cx, cy] = px(c.x, c.y); segs.push(`<line x1="${cx}" y1="${barY}" x2="${cx}" y2="${cy}" stroke="#18181B" stroke-opacity=".7" stroke-width="2" />`); });
+    });
+    return `<svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 ${W} ${H}">${segs.join('')}</svg>`;
+  }
+
+  function stageHTML() {
+    return nodes.map(n => `
+      <div class="stage-node ${n.role==='mirasbirakan'?'mb':(n.gender==='m'?'m':'')} ${n.dead?'dead':''}" data-idx="${nodes.indexOf(n)}" style="left:${n.x}%;top:${n.y}%">
+        <div class="shape">${n.role==='mirasbirakan'?'⊗':''}</div>
+        <div class="lbl">${n.label}</div>
+        ${n.locked ? '<div class="lockbadge">🔒 manuel</div>' : ''}
+      </div>`).join('');
+  }
+
+  function render() {
+    computeWarnings();
+    quickAutoXY();
+    document.getElementById('nodeList').innerHTML = nodeListHTML();
+    document.getElementById('unionList').innerHTML = unionListHTML();
+    document.getElementById('warnBox').innerHTML = warnBoxHTML();
+    const outer = document.getElementById('stageOuter');
+    outer.innerHTML = stageLinesSvg(outer) + stageHTML();
+    bindNodeInputs();
+    bindUnionInputs();
+    bindDrag();
+    renderPreview();
+    renderJson();
+  }
+
+  function redrawStageLines() {
+    const outer = document.getElementById('stageOuter');
+    const old = outer.querySelector('svg');
+    if (old) old.outerHTML = stageLinesSvg(outer);
+  }
+
+  function bindNodeInputs() {
+    document.querySelectorAll('[data-f]').forEach(el => {
+      el.addEventListener('input', () => {
+        const i = +el.dataset.idx;
+        const f = el.dataset.f;
+        if (el.type === 'checkbox') nodes[i][f] = el.checked;
+        else if (f === 'gen') nodes[i][f] = parseInt(el.value, 10) || 0;
+        else nodes[i][f] = el.value;
+        if (f === 'gen') { render(); return; }
+        renderPreview(); renderJson();
+        if (f === 'label') { const s = document.querySelector(`.stage-node[data-idx="${i}"] .lbl`); if (s) s.textContent = el.value; }
+      });
+    });
+    document.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => {
+      const i = +btn.dataset.del;
+      const removedId = nodes[i].id;
+      nodes.splice(i, 1);
+      unions.forEach(u => { u.partners = u.partners.filter(id=>id!==removedId); u.children = u.children.filter(id=>id!==removedId); });
+      render();
+    }));
+    document.querySelectorAll('[data-unlock]').forEach(btn => btn.addEventListener('click', () => {
+      const i = +btn.dataset.unlock;
+      nodes[i].locked = false; nodes[i].x = undefined; nodes[i].y = undefined;
+      render();
+    }));
+  }
+
+  function bindUnionInputs() {
+    document.querySelectorAll('[data-uf]').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const i = +sel.dataset.uidx;
+        const f = sel.dataset.uf;
+        if (f === 'type') unions[i].type = sel.value;
+        else unions[i][f] = Array.from(sel.selectedOptions).map(o=>o.value);
+        render();
+      });
+    });
+    document.querySelectorAll('[data-udel]').forEach(btn => btn.addEventListener('click', () => {
+      unions.splice(+btn.dataset.udel, 1); render();
+    }));
+  }
+
+  function bindDrag() {
+    const outer = document.getElementById('stageOuter');
+    let dragging = null;
+    outer.querySelectorAll('.stage-node').forEach(el => {
+      el.addEventListener('pointerdown', e => {
+        dragging = { idx: +el.dataset.idx, el };
+        el.setPointerCapture(e.pointerId);
+      });
+    });
+    outer.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const rect = outer.getBoundingClientRect();
+      let x = (e.clientX - rect.left) / rect.width * 100;
+      let y = (e.clientY - rect.top) / rect.height * 100;
+      x = Math.max(2, Math.min(98, x));
+      y = Math.max(4, Math.min(96, y));
+      nodes[dragging.idx].x = x; nodes[dragging.idx].y = y;
+      nodes[dragging.idx].locked = true;
+      dragging.el.style.left = x + '%'; dragging.el.style.top = y + '%';
+      redrawStageLines();
+    });
+    window.addEventListener('pointerup', () => {
+      if (dragging) { render(); dragging = null; }
+    });
+  }
+
+  function buildVd() {
+    const cleanNodes = nodes.map(n => {
+      const o = { id:n.id, label:n.label, gender:n.gender };
+      if (n.subLabel) o.subLabel = n.subLabel;
+      if (n.role) o.role = n.role;
+      if (n.dead) o.dead = true;
+      if (n.heir === false) o.heir = false;
+      if (n.sub) o.sub = n.sub;
+      if (n.reserved) o.reserved = n.reserved;
+      if (n.reason) o.reason = n.reason;
+      if (n.locked) { o.x = +(+n.x).toFixed(1); o.y = +(+n.y).toFixed(1); }
+      else { o.gen = n.gen || 0; }
+      return o;
+    });
+    const cleanUnions = unions.map(u => {
+      const o = { partners: u.partners, children: u.children };
+      if (u.type && u.type !== 'marriage') o.type = u.type;
+      return o;
+    });
+    return { title: 'Sandbox önizleme', cases: [ { law: document.getElementById('lawText').value, nodes: cleanNodes, unions: cleanUnions } ] };
+  }
+
+  function renderPreview() {
+    const el = document.getElementById('livePreview');
+    if (!window.HMGSV3 || !window.HMGSV3.supports('family_tree')) { el.innerHTML = '<p style="color:#C4362F">Motor yüklenemedi.</p>'; return; }
+    try {
+      window.HMGSV3.render(el, 'sandbox', buildVd(), { visualType: 'family_tree' });
+    } catch(e) {
+      el.innerHTML = '<p style="color:#C4362F">Hata: ' + e.message + '</p>';
+    }
+  }
+
+  function renderJson() {
+    document.getElementById('jsonOut').value = JSON.stringify(buildVd(), null, 2);
+  }
+
+  document.getElementById('addNode').addEventListener('click', addNode);
+  document.getElementById('addUnion').addEventListener('click', addUnion);
+  document.getElementById('loadSample').addEventListener('click', sample);
+  document.getElementById('clearAll').addEventListener('click', () => { nodes=[]; unions=[]; render(); });
+  document.getElementById('lawText').addEventListener('input', () => { renderPreview(); renderJson(); });
+  document.getElementById('copyJson').addEventListener('click', () => {
+    navigator.clipboard.writeText(document.getElementById('jsonOut').value);
+  });
+
+  sample();
+})();
+</script>
+</body>
+</html>

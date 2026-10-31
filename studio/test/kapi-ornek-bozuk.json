@@ -1,0 +1,113 @@
+﻿[
+ {
+  "id": "hmgsai_test_bozuk_001",
+  "tags": ["Test"],
+  "subjectId": "medeni_hukuk",
+  "topicId": "tpc_medeni_001",
+  "qNumber": 1,
+  "stem": "Bu ünitede ehliyet konusunun kanuni şartları, kurucu unsurları ve istisnai düzenlemeleri ele alınır. Aşağıdakilerden hangisi doğrudur?",
+  "options": [
+    {"key": "A", "text": "Her insanın hak ehliyeti vardır."},
+    {"key": "B", "text": "Fiil ehliyeti için ayırt etme gücü gereklidir."},
+    {"key": "C", "text": "Erginlik on sekiz yaşın doldurulmasıyla başlar."},
+    {"key": "D", "text": "Evlenme kişiyi ergin kılar."},
+    {"key": "E", "text": "Kısıtlılık ehliyeti daraltır."}
+  ],
+  "correct": "A",
+  "explanation": "Doğru: A. Bu konuda genel kural geçerlidir ve istisnalar saklıdır. Diğer şıklar kanuna aykırıdır.",
+  "legalBasis": "",
+  "difficulty": "kolay",
+  "source": "ai_hmgs_benzeri",
+  "qType": "onerme",
+  "negativeStem": true,
+  "dateAdded": "2026-09-15"
+ },
+ {
+  "id": "hmgsai_test_bozuk_002",
+  "tags": ["Test"],
+  "subjectId": "ceza_hukuku",
+  "topicId": "tpc_ceza_001",
+  "stem": "5237 sayılı Türk Ceza Kanunu'na göre kanunilik ilkesi ile ilgili aşağıdaki ifadelerden hangisi yanlıştır?",
+  "options": [
+    {"key": "A", "text": "Suç ve ceza ancak kanunla konulabilir."},
+    {"key": "B", "text": "Kıyas yoluyla suç ihdas edilemez."},
+    {"key": "C", "text": "Kanunun açıkça suç saymadığı fiil cezalandırılamaz."},
+    {"key": "D", "text": "Ceza hükümleri dar yorumlanır."},
+    {"key": "E", "text": ""}
+  ],
+  "correct": "E",
+  "explanation": "Doğru: E. Kanunilik ilkesi uyarınca suç ve ceza kanunla konulur; belirlilik ve kıyas yasağı bu ilkenin alt ilkeleridir ve 5237 sayılı TCK m. 2'de düzenlenmiştir. E şıkkındaki ifade kanunda yer almamaktadır.",
+  "legalBasis": "5237 sayılı TCK m. 2",
+  "difficulty": "orta",
+  "source": "ai_hmgs_benzeri",
+  "qType": "onerme",
+  "negativeStem": true,
+  "dateAdded": "2026-09-15"
+ },
+ {
+  "id": "hmgsai_test_bozuk_003",
+  "tags": ["Test"],
+  "subjectId": "borclar_hukuku",
+  "topicId": "tpc_borclar_001",
+  "stem": "6098 sayılı Türk Borçlar Kanunu'na göre sözleşmenin kurulmasıyla ilgili aşağıdakilerden hangisi doğrudur?",
+  "options": [
+    {"key": "A", "text": "İcap ve kabulün karşılıklı ve birbirine uygun olması gerekir."},
+    {"key": "B", "text": "Sözleşme kural olarak icabın kabulüyle kurulur."},
+    {"key": "C", "text": "Süreli icapta sürenin geçmesiyle icap düşer."},
+    {"key": "D", "text": "Hazır olmayanlar arasında icap bağlayıcıdır."},
+    {"key": "E", "text": "Örtülü kabul her hâlde mümkündür."}
+  ],
+  "correct": "A",
+  "explanation": "Doğru: A. 6098 sayılı TBK m. 1'e göre sözleşme, tarafların iradelerini karşılıklı ve birbirine uygun olarak açıklamalarıyla kurulur. Diğer şıklar maddede belirtilen koşulları eksik ya da fazla yansıtmaktadır.",
+  "legalBasis": "6098 sayılı TBK m. 1",
+  "difficulty": "kolay",
+  "source": "ai_hmgs_benzeri",
+  "qType": "onculu",
+  "negativeStem": false,
+  "dateAdded": "2026-09-15"
+ },
+ {
+  "id": "hmgsai_test_bozuk_004",
+  "tags": ["Test"],
+  "subjectId": "hmk",
+  "topicId": "tpc_hmk_001",
+  "stem": "6100 sayılı Hukuk Muhakemeleri Kanunu'na göre görevli mahkeme ile ilgili aşağıdaki ifadelerden hangisi yanlıştır?\n• Görev kuralları kamu düzenindendir.\n• Taraflar görev sözleşmesi yapabilir.\n• Görevsizlik kararı re'sen verilir.",
+  "options": [
+    {"key": "A", "text": "Görev kuralları kamu düzenindendir ve hâkim tarafından re'sen gözetilir."},
+    {"key": "B", "text": "Taraflar aralarında görev sözleşmesi yaparak mahkemenin görevini değiştiremez."},
+    {"key": "C", "text": "Görevsizlik kararı, davanın her aşamasında re'sen verilebilir."},
+    {"key": "D", "text": "Taraflar, aralarında anlaşarak görevli mahkemeyi belirleyebilir."},
+    {"key": "E", "text": "Görevsizlik kararı üzerine dosya görevli mahkemeye gönderilir."}
+  ],
+  "correct": "D",
+  "explanation": "Doğru: D. 6100 sayılı HMK m. 1'e göre göreve ilişkin kurallar kamu düzenindendir; görev, tarafların anlaşmasıyla belirlenemez. Mahkeme, görevli olup olmadığını re'sen inceler. \n• A şıkkı: Doğrudur; görev kuralları kamu düzenindendir. \n• B şıkkı: Doğrudur; görev sözleşmesi yapılamaz. \n• C şıkkı: Doğrudur; görevsizlik kararı re'sen verilir. \n• E şıkkı: Doğrudur; görevsizlik kararı verilirse dosya görevli mahkemeye gönderilir.",
+  "legalBasis": "6100 sayılı HMK m. 1",
+  "difficulty": "orta",
+  "source": "ai_hmgs_benzeri",
+  "qType": "onerme",
+  "negativeStem": true,
+  "dateAdded": "2026-09-15"
+ },
+ {
+  "id": "hmgsai_test_bozuk_005",
+  "tags": ["Test"],
+  "subjectId": "yok_boyle_ders",
+  "stem": "5718 sayılı Milletlerarası Özel Hukuk ve Usul Hukuku Hakkında Kanun'a göre yabancı mahkeme kararlarının tenfizi ile ilgili aşağıdakilerden hangisi doğrudur?",
+  "options": [
+    {"key": "A", "text": "Tenfiz kararı verilmesi hâlinde karar icra edilebilir."},
+    {"key": "B", "text": "Tenfiz istemi dilekçeyle yapılır."},
+    {"key": "C", "text": "Yabancı mahkeme kararı kesinleşmiş olmalıdır."},
+    {"key": "D", "text": "Kamu düzeni tenfiz engelidir."},
+    {"key": "E", "text": "Mütekabiliyet şartı aranır."}
+  ],
+  "correct": "A",
+  "explanation": "Doğru: A. 5718 sayılı Kanun m. 50'ye göre tenfiz isteminin kabulü hâlinde yabancı karar icra edilebilir. Bu, kanunda düzenlenmiştir ve uygulamada bu şekilde sonuç doğurur.",
+  "legalBasis": "5718 sayılı MÖHUK m. 50",
+  "difficulty": "oрта",
+  "source": "ai_hmgs_benzeri",
+  "qType": "kavram",
+  "negativeStem": false,
+  "twinOf": "hmgs_2026_04_999",
+  "dateAdded": "2026-09-15"
+ }
+]

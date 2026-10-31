@@ -1,0 +1,33 @@
+﻿[
+ {
+  "id": "hmgsai_anayasa_yargisi_001",
+  "tags": ["Bireysel Başvuru", "Başvuru Süresi"],
+  "subjectId": "anayasa_yargisi",
+  "topicId": "tpc_anayasa_yargisi_001",
+  "topicTitle": "Anayasa Mahkemesinin Yapısı, Üyeleri, Seçim Usulü ve Görevleri",
+  "qNumber": 1,
+  "stem": "6216 sayılı Anayasa Mahkemesinin Kuruluşu ve Yargılama Usulleri Hakkında Kanun'a göre, Anayasa Mahkemesine bireysel başvuru, ihlale neden olduğu ileri sürülen işlem, eylem ya da ihmal için kanunda öngörülmüş idari ve yargısal başvuru yollarının tamamının tüketilmiş olması kaydıyla, hangi süre içinde yapılır?",
+  "options": [
+    {"key": "A", "text": "İhlalin öğrenildiği tarihten itibaren on beş gün içinde"},
+    {"key": "B", "text": "İhlalin öğrenildiği tarihten itibaren otuz gün içinde"},
+    {"key": "C", "text": "İhlalin öğrenildiği tarihten itibaren altmış gün içinde"},
+    {"key": "D", "text": "İhlalin gerçekleştiği tarihten itibaren altı ay içinde"},
+    {"key": "E", "text": "Başvuru yollarının tüketildiği tarihten itibaren bir yıl içinde"}
+  ],
+  "correct": "B",
+  "explanation": "Doğru: B. 6216 sayılı Kanun m. 47/5'e göre bireysel başvurunun, ihlale neden olduğu ileri sürülen işlem, eylem ya da ihmal için kanunda öngörülmüş idari ve yargısal başvuru yollarının tamamının tüketilmiş olması koşuluyla, ihlalin öğrenildiği tarihten itibaren otuz gün içinde yapılması gerekir. \n• A şıkkı: On beş gün, Avrupa İnsan Hakları Mahkemesine başvuruda eski süredir; bireysel başvuruda mazeret ve giderlerle ilgili diğer sürelerle karıştırılmak istenmiştir. \n• C şıkkı: Altmış gün, Anayasa Mahkemesinde doğrudan iptal davası açma süresidir (6216 m. 38). \n• D şıkkı: Altı ay, idari yargıda dava açma sürelerinden biri olup Anayasa m. 125'e dayanır; bireysel başvuruda uygulanmaz. \n• E şıkkı: Başvuru yollarının tüketildiği tarihe değil, ihlalin öğrenildiği tarihe bağlanmıştır; bir yıllık süre öngörülmemiştir.",
+  "legalBasis": "6216 sayılı Kanun m. 47/5",
+  "difficulty": "orta",
+  "source": "ai_hmgs_benzeri",
+  "category": "HMGS Benzeri (AI)",
+  "sourceBadgeLabel": "🤖 HMGS BENZERİ · AI ÜRETİMİ",
+  "examMeta": {"examType": "HMGS Benzeri", "examYear": 2026, "isRealExam": false, "badgeLabel": "🤖 HMGS BENZERİ · AI ÜRETİMİ"},
+  "examTarget": "hmgs_core",
+  "examTargetLabel": "HMGS Çekirdek",
+  "qType": "sayi",
+  "negativeStem": false,
+  "twinOf": null,
+  "verify": "kesin",
+  "dateAdded": "2026-09-15"
+ }
+]

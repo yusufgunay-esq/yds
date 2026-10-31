@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<!--
+  family-tree-pilot.html — PROTOTİP SANDBOX (canlı veriye dokunmaz)
+  Amaç: `family_tree` görsel kalıbını (soy ağacı) kullanıcı onayından önce
+  izole ortamda göstermek. GORSELLESTIRME_VE_KAPSAM_STANDARDI.md §C.1 kuralı:
+  "Yeni render motorları test_modu.html sandbox'ında geliştirilir, kullanıcı
+  istatistikleri riske atılmaz."
+
+  Kullanım: baslat.bat çalışırken tarayıcıda aç:
+  http://localhost:8765/studio/test/family-tree-pilot.html
+
+  26 Tem, 2. tur revizyonu — kullanıcı geri bildirimi ("çok karışık, bağlar
+  görünmüyor, miras hukukunu tam anlamamış gibi"):
+  1) GERÇEK HATA düzeltildi: bağlantı çizgileri, sahne boyutuyla uyumsuz SVG
+     viewBox yüzünden pratikte görünmüyordu. Artık gerçek piksel ölçümüyle
+     çiziliyor, koyu ve net.
+  2) Elle x/y tahmini yerine `gen` (kuşak no) tabanlı OTOMATİK yerleşim —
+     çakışma yok, hiyerarşi otomatik ortalanıyor.
+  3) İlişki türü ayrımı eklendi: evlilik (çift çizgi), evlilik dışı ilişki
+     (kesikli çizgi + etiket), boşanmış (çift çizgi + ✕). 4. örnek bunu
+     doğrudan gösteriyor: TMK'da soybağı kurulmuş çocuk, ebeveynin evli olup
+     olmamasından bağımsız TAM ve EŞİT mirasçıdır — sadece ebeveynler
+     arasındaki bağın çizim stili farklıdır, çocuğun payı ASLA farklı değildir.
+  4) Sol kenarda kuşak etiketleri (Üstsoy / Mirasbırakan / Altsoy) — hiyerarşi
+     bir bakışta görünür.
+
+  Dört örnek de gerçek TMK m.495-501 (zümre), m.506 (saklı pay) ve soybağı
+  eşitliği ilkesine dayanır; kişiler ve sayılar sentetiktir.
+-->
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototip · Soy Ağacı (family_tree)</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background:#FAF9F6; color:#18181B; margin:0; padding:2.5rem 1.5rem 5rem; }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin-bottom: .3rem; }
+  p.sub { color:#6B6B72; font-size:.95rem; margin-bottom: 1.6rem; line-height:1.6; max-width:66ch; }
+  .card { background:#fff; border:1px solid rgba(24,24,27,.1); border-radius:20px; padding:1.8rem 1.8rem 1.5rem; box-shadow:0 1px 2px rgba(24,24,27,.04),0 8px 24px rgba(24,24,27,.05); margin-bottom: 2rem; }
+  .note { font-size:.85rem; color:#6B6B72; background:#F2F1EC; border-radius:12px; padding:.9rem 1.1rem; margin-bottom:1.8rem; line-height:1.6; }
+  .note b { color:#18181B; }
+  .fix-list { font-size:.85rem; color:#3F3F46; background:#EEF2FF; border:1px solid rgba(91,91,214,.25); border-radius:12px; padding:1rem 1.2rem; margin-bottom:1.8rem; line-height:1.7; }
+  .fix-list b { color:#4642B4; }
+  .links { font-size:.85rem; margin-bottom:1.8rem; }
+  .links a { color:#4642B4; text-decoration:none; font-weight:600; }
+  .links a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Prototip: İnteraktif Soy Ağacı (<code>family_tree</code>) — 2. tur</h1>
+  <p class="sub">
+    İlk turda bağlantı çizgileri pratikte görünmüyordu ve elle koordinat tahmini
+    çakışan/karmaşık bir görünüme yol açıyordu. Bu turda kökten değişti.
+  </p>
+  <div class="fix-list">
+    <b>Bu turda ne değişti:</b><br>
+    1) Bağlantı çizgisi görünmezliği gerçek bir render hatasıydı, düzeltildi — çizgiler artık koyu ve net.<br>
+    2) Elle x/y yerine kuşak (üstsoy/mirasbırakan/altsoy) bazlı otomatik yerleşim — çakışma yok.<br>
+    3) Evlilik / evlilik dışı ilişki / boşanmış çizgi türleri ayrıştırıldı (4. örnek: "metres" senaryosu).<br>
+    4) Sol kenarda kuşak etiketleri eklendi — kim kime nasıl bağlı, bir bakışta görünüyor.
+  </div>
+  <div class="note">
+    Bu sayfa yalnızca motoru göstermek için var; <code>topics.js</code>'e henüz yazılmadı.
+    Düğüm konumlarını görsel olarak denemek için:
+    <span class="links"><a href="family-tree-editor.html">soy ağacı editörü (sandbox) →</a></span>
+  </div>
+  <div class="card" id="stage"></div>
+</div>
+
+<script src="../../js/visual-engines-v3.js"></script>
+<script>
+  const vd = {
+    title: "Yasal Mirasçılık: Zümre Sistemi, Halefiyet ve İlişki Türleri — 4 Pratik",
+    cases: [
+      {
+        law: "Sağ kalan eş, 1. zümre (altsoy) ile birlikte mirasçı olduğunda terekenin 1/4'ünü alır; kalan 3/4 altsoy arasında eşit paylaşılır (TMK m.499-500).",
+        genLabels: { "0": "Mirasbırakan / Eş", "1": "Altsoy — Çocuklar" },
+        nodes: [
+          { id:'mb1', label:'Mirasbırakan', role:'mirasbirakan', gen:0 },
+          { id:'es1', label:'Ayşe', subLabel:'eş', gender:'f', sub:'1/4', reserved:'1/4', gen:0,
+            reason:"Eş, 1. zümreyle birlikte mirasçı olduğunda terekenin 1/4'ünü alır (TMK m.499). Saklı payı, 1. zümreyle birlikteyken yasal payının tamamıdır (TMK m.506) → 1/4." },
+          { id:'ali1', label:'Ali', subLabel:'oğul', gender:'m', sub:'3/8', reserved:'3/16', gen:1,
+            reason:"Kalan 3/4, altsoy arasında eşit paylaşılır: 3/4 ÷ 2 = 3/8 (TMK m.500). Saklı pay, yasal payın yarısı: 3/8 ÷ 2 = 3/16 (TMK m.506)." },
+          { id:'mehmet1', label:'Mehmet', subLabel:'oğul', gender:'m', sub:'3/8', reserved:'3/16', gen:1,
+            reason:"Kalan 3/4, altsoy arasında eşit paylaşılır: 3/4 ÷ 2 = 3/8 (TMK m.500). Saklı pay, yasal payın yarısı: 3/8 ÷ 2 = 3/16 (TMK m.506)." }
+        ],
+        unions: [ { partners:['mb1','es1'], type:'marriage', children:['ali1','mehmet1'] } ]
+      },
+      {
+        law: "Bir altsoy mirasbırakandan önce ölmüşse payı kendi altsoyuna (halefiyet/temsil) geçer — bölüşüm ZÜMRE değil KÖK başına yapılır (TMK m.495/2).",
+        genLabels: { "0": "Mirasbırakan / Eş", "1": "Çocuklar (Mehmet önce vefat)", "2": "Torunlar — halefiyetle mirasçı" },
+        nodes: [
+          { id:'mb2', label:'Mirasbırakan', role:'mirasbirakan', gen:0 },
+          { id:'es2', label:'Ayşe', subLabel:'eş', gender:'f', sub:'1/4', reserved:'1/4', gen:0,
+            reason:"Eş burada da 1. zümreyle birlikte olduğu için 1/4 alır (TMK m.499) — bir altsoyun ölmüş olması eşin payını değiştirmez. Saklı payı yine yasal payının tamamı: 1/4." },
+          { id:'ali2', label:'Ali', subLabel:'oğul', gender:'m', sub:'3/8', reserved:'3/16', gen:1,
+            reason:"Kalan 3/4, KÖK başına eşit paylaşılır: Ali'nin kökü ve Mehmet'in kökü, her biri 3/8 (TMK m.500). Saklı pay: 3/8 ÷ 2 = 3/16 (TMK m.506)." },
+          { id:'mehmet2', label:'Mehmet', subLabel:'oğul · önce vefat', gender:'m', dead:true, heir:false, gen:1 },
+          { id:'cem2', label:'Cem', subLabel:'torun', gender:'m', sub:'3/16', reserved:'3/32', gen:2,
+            reason:"Mehmet önce öldüğü için payı (3/8), TMK m.495/2 halefiyet ilkesiyle altsoyuna (Cem, Deniz) EŞİT bölünerek geçer: 3/8 ÷ 2 = 3/16. Saklı pay (altsoy): 3/16 ÷ 2 = 3/32." },
+          { id:'deniz2', label:'Deniz', subLabel:'torun', gender:'f', sub:'3/16', reserved:'3/32', gen:2,
+            reason:"Mehmet önce öldüğü için payı (3/8), TMK m.495/2 halefiyet ilkesiyle altsoyuna (Cem, Deniz) EŞİT bölünerek geçer: 3/8 ÷ 2 = 3/16. Saklı pay (altsoy): 3/16 ÷ 2 = 3/32." }
+        ],
+        unions: [
+          { partners:['mb2','es2'], type:'marriage', children:['ali2','mehmet2'] },
+          { partners:['mehmet2'], children:['cem2','deniz2'] }
+        ]
+      },
+      {
+        law: "Altsoy yoksa 2. zümreye geçilir: ana-baba sağsa yarı yarıya (1/2, 1/2) alır. Biri önce ölmüşse payı kendi altsoyuna (mirasbırakanın kardeşlerine) halefiyetle geçer (TMK m.496).",
+        genLabels: { "-1": "Üstsoy — Ana-Baba (2. Zümre)", "0": "Mirasbırakan / Kız Kardeş (halefiyetle)" },
+        nodes: [
+          { id:'baba3', label:'Baba', gender:'m', sub:'1/2', reserved:'1/8', gen:-1,
+            reason:"2. zümrede ana ve baba sağsa terekeyi yarı yarıya paylaşırlar (TMK m.496). Saklı pay (ana-baba): yasal payın 1/4'ü: 1/2 × 1/4 = 1/8 (TMK m.506)." },
+          { id:'anne3', label:'Anne', subLabel:'önce vefat', gender:'f', dead:true, heir:false, gen:-1 },
+          { id:'mb3', label:'Mirasbırakan', role:'mirasbirakan', gen:0 },
+          { id:'zeynep3', label:'Zeynep', subLabel:'kız kardeş', gender:'f', sub:'1/2', reserved:null, gen:0,
+            reason:"Anne mirasbırakandan önce öldüğü için payı (1/2), TMK m.496/2 halefiyetiyle kendi altsoyuna (mirasbırakanın anne-bir kardeşi Zeynep) geçer. Kardeşlerin saklı payı YOKTUR (2019 değişikliğiyle TMK m.506'dan çıkarıldı) — sınav tuzağı budur." }
+        ],
+        unions: [ { partners:['baba3','anne3'], type:'marriage', children:['mb3','zeynep3'] } ]
+      },
+      {
+        law: "Soybağı (nesep) kurulmuş her çocuk, ana-babasının evli olup olmamasından bağımsız TAM ve EŞİT mirasçıdır (TMK m.282 vd., m.498) — evlilik dışı ilişkiden doğan çocuk için pay AZALMAZ. Farklı olan yalnızca ebeveynler arasındaki bağın türüdür, çocuğun mirasçılığı DEĞİL.",
+        genLabels: { "0": "Mirasbırakan / Eşler", "1": "Altsoy — üç çocuk da EŞİT mirasçı" },
+        nodes: [
+          { id:'mb4', label:'Mirasbırakan', role:'mirasbirakan', gen:0 },
+          { id:'res4', label:'Ayşe', subLabel:'resmi eş', gender:'f', sub:'1/4', reserved:'1/4', gen:0,
+            reason:"Eş, 1. zümreyle birlikte 1/4 alır (TMK m.499). Saklı payı yasal payının tamamı: 1/4." },
+          { id:'sev4', label:'Sevgi', subLabel:'evlilik dışı ilişki · mirasçı değil', gender:'f', heir:false, gen:0 },
+          { id:'ali4', label:'Ali', subLabel:'oğul (resmi eş)', gender:'m', sub:'1/4', reserved:'1/8', gen:1,
+            reason:"Kalan 3/4, üç çocuğa EŞİT paylaşılır (soybağı kurulmuş her çocuk eşittir): 3/4 ÷ 3 = 1/4. Saklı pay: 1/4 ÷ 2 = 1/8 (TMK m.506)." },
+          { id:'zeynep4', label:'Zeynep', subLabel:'kız (resmi eş)', gender:'f', sub:'1/4', reserved:'1/8', gen:1,
+            reason:"Kalan 3/4, üç çocuğa EŞİT paylaşılır: 3/4 ÷ 3 = 1/4. Saklı pay: 1/4 ÷ 2 = 1/8 (TMK m.506)." },
+          { id:'kerem4', label:'Kerem', subLabel:'oğul (Sevgi\'den, babalık davasıyla soybağı kurulmuş)', gender:'m', sub:'1/4', reserved:'1/8', gen:1,
+            reason:"Babalık davasıyla soybağı kurulduğu için Kerem, Ali ve Zeynep ile TAM EŞİT mirasçıdır (TMK m.498) — evlilik dışı doğmuş olması payını AZALTMAZ: 3/4 ÷ 3 = 1/4. Saklı pay: 1/4 ÷ 2 = 1/8. Sınav tuzağı: 'evlilik dışı çocuk daha az pay alır' YANLIŞTIR." }
+        ],
+        unions: [
+          { partners:['mb4','res4'], type:'marriage', children:['ali4','zeynep4'] },
+          { partners:['mb4','sev4'], type:'informal', children:['kerem4'] }
+        ]
+      }
+    ]
+  };
+
+  if (!window.HMGSV3 || !window.HMGSV3.supports('family_tree')) {
+    document.getElementById('stage').innerHTML = '<p style="color:#C4362F">HMGSV3 motoru yüklenemedi veya family_tree henüz desteklenmiyor.</p>';
+  } else {
+    window.HMGSV3.render(document.getElementById('stage'), 'pilot', vd, { visualType: 'family_tree' });
+  }
+</script>
+</body>
+</html>
