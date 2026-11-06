@@ -130,7 +130,7 @@ export function registerPratikEvents() {
     }
 
     // Switch to practice view
-    if (startSession({ subjectId: subj, count: 5 })) {
+    if (startSession({ mode: 'subject', subjectId: subj, count: 5 })) {
       const nav = document.querySelector('.nav [data-view="practice"]');
       if (nav) nav.click();
     }
