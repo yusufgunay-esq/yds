@@ -940,7 +940,6 @@ function syncPanelHTML() {
         <button class="btn${sent ? ' btn-2' : ''}" data-act="push-session" ${sent || busy ? 'disabled' : ''}>
           ${btnLabel}
         </button>
-        ${!sent ? `<button class="btn btn-2" data-act="copy-session-to-takip">Panoya kopyala (Takip'e yapıştır)</button>` : ''}
         <span id="sync-status" class="hint" style="margin:0;align-self:center">${esc(statusLine)}</span>
       </div>
       ${!sent ? `<p class="hint" style="margin-top:0.5rem">

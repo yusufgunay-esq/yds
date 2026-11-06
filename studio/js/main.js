@@ -12,7 +12,7 @@
 
 import { $, $$, toast } from './ui.js';
 import { initData, initDataAsync, populateData, topicById, questionById } from './data.js';
-import { load, save, daysLeft, state, getSettings, updateSettings, importTakipExams, reconcilePastData } from './store.js';
+import { load, save, daysLeft, state, getSettings, updateSettings, reconcilePastData } from './store.js';
 import { requestDriveLoginAndDownload, clearVaultIndexedDB, syncStudioProgress, requestSilentToken, fetchVaultFromDrive } from './vault-client.js';
 import { applySrsPolicy } from './engine.js';
 import { kuralToggle } from './kural.js';
@@ -605,44 +605,6 @@ function renderDriveConnectScreen() {
 }
 
 
-/* ---------- Takip Uygulaması Deneme Köprüsü ---------- */
-
-async function syncTakipExams() {
-  if (typeof window === 'undefined') return;
-  try {
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    let exams = [];
-    if (isLocal) {
-      try {
-        const res = await fetch('/api/takip-denemeler');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.ok && Array.isArray(data.exams)) exams = data.exams;
-        }
-      } catch (err) {}
-    }
-    if (!exams.length) {
-      try {
-        const resExp = await fetch('studio_sessions_export.json');
-        if (resExp.ok) {
-          const dataExp = await resExp.json();
-          if (Array.isArray(dataExp.exams)) exams = dataExp.exams;
-        }
-      } catch (err) {}
-    }
-    if (exams.length) {
-      const changed = importTakipExams(exams);
-      if (changed) {
-        if (currentView === 'today') today.render();
-        else if (currentView === 'progress') progress.render($('#view-progress'));
-      }
-    }
-  } catch (e) {
-    // sessiz geçiş
-  }
-}
-
-
 /* ---------- günün rotası: adım başlatıcı ----------
    Karar rota.js'te; burası yalnız adımı doğru seansa çevirir. Adım ne kadar
    kaldıysa seans o kadar soruyla açılır, cevaplar `set` etiketiyle kaydolur ve
@@ -766,8 +728,6 @@ async function boot() {
       }
     }).catch(() => {});
 
-    // Takip Uygulamasından gelen denemeleri içeri aktar
-    syncTakipExams().catch(() => {});
 
 
     // Veri sorunlarını sessizce geçme
