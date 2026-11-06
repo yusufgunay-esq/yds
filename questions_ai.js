@@ -1,7 +1,4 @@
-/* ==========================================================================
-   YDS STÜDYO — AI VE MODEL DESTEKLİ DENEME VE SORU BATARYASI
-   © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır.
-   ========================================================================== */
+/* YDS Stüdyo: AI üretimi sorular (derle.py ile üretildi; elle düzenleme, arşivdeki JSON'u düzenle) */
 
 const QUESTIONS_AI_DATA = [
   {
@@ -42,8 +39,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Cümlede yenilenebilir enerji kaynaklarının hava koşullarına bağlı olduğu ve bu yüzden kesintisiz/istikrarlı bir elektrik tedariki sağlamak için 'önemli/büyük miktarda' (substantial) yedek sisteme ihtiyaç duyulduğu belirtilmektedir.\nA) fragile: kırılgan\nB) substantial: önemli, hatırı sayılır derecede büyük (Doğru)\nC) negligible: ihmal edilebilir\nD) arbitrary: keyfi, rastgele\nE) superficial: yüzeysel",
     "legalBasis": "ÖSYM YDS Kelime / Sıfat Dağılımı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -92,8 +89,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Boşluktan sonra 'roughly 80 percent' (yaklaşık yüzde 80) oranı gelmektedir. İngilizcede bir oranı, payı oluşturmak veya teşkil etmek anlamında 'account for' veya 'make up' kullanılır.\nA) account for: oluşturmak, tekabül etmek; açıklamak (Doğru)\nB) turn down: reddetmek; kısmak\nC) run out: tükenmek\nD) bring up: yetiştirmek; gündeme getirmek\nE) put off: ertelemek",
     "legalBasis": "ÖSYM YDS Phrasal Verbs Formatı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -142,8 +139,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Cümlede arkeoloji ekibinin binlerce yıldır çöl kumlarının altında gömülü kalmış olan geniş bir sulama kanalları ağını 'ortaya çıkarmayı / gün yüzüne çıkarmayı' başardığı anlatılmaktadır.\nA) obstruct: engellemek\nB) uncover: ortaya çıkarmak, açığa çıkarmak (Doğru)\nC) deteriorate: kötüleşmek\nD) eliminate: ortadan kaldırmak\nE) provoke: kışkırtmak",
     "legalBasis": "ÖSYM YDS Fiil Formatı",
     "difficulty": "kolay",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -193,8 +190,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "'Ever since' bağlacı kuralı gereği: 'Since'li yan cümlecikte geçmişte belirli bir nokta verildiği için Past Simple (was performed), ana cümlede ise geçmişten günümüze süregelen etki anlatıldığı için Present Perfect (have improved) kullanılır. Bu kural YDS'de en kesin soru kalıplarından biridir.",
     "legalBasis": "ÖSYM YDS Dilbilgisi / Tense Dağılımı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -244,8 +241,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Boşluğun devamında 'widespread skepticism...' şeklinde bir isim tamlaması (noun phrase) yer almaktadır ve ana cümlede girişimin son derece dirençli çıkıp milyonları yoksulluktan kurtardığı (+) belirtilmiştir. Şüphecilik (-) ile başarı (+) arasındaki zıtlığı bir isim tamlamasıyla bağlayabilen tek bağlaç 'Despite' (e rağmen) dir.",
     "legalBasis": "ÖSYM YDS Bağlaç Formatı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -294,8 +291,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Kalıp edatlar (prepositions): 'To be concerned about / over sth' (-hakkında endişe duymak) ve 'a threat to sth' (-e yönelik tehdit). Dolayısıyla 'about / to' ikilisi tam oturur.",
     "legalBasis": "ÖSYM YDS Edat Sorusu",
     "difficulty": "kolay",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -345,8 +342,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Cümle başında 'Although' zıtlık bağlacı ve 'early computer algorithms' (erken dönem / ilkel aşama) vurgulanmıştır. Zıtlık kuralı gereği, ana cümlede günümüzdeki muazzam gelişim (modern systems have evolved to process vast unstructured data...) aranır. A, C ve D şıkları zıtlık değil negatif devam oluşturur; E şıkkı ise iki bağlaçlı cümle hatası yapar.",
     "legalBasis": "ÖSYM YDS Cümle Tamamlama Formatı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -396,8 +393,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Cümle yapısı: 'not only ... but also ...' (sadece ... değil, aynı zamanda ...). Özne: 'Sleep deprivation' (Uykusuzluk). Yüklemler: 1. impairs (zayıflatır / zayıflatmakla kalmaz), 2. increases the risk (riskini artırır). A şıkkı bu yapıyı eksiksiz ve birebir karşılar.",
     "legalBasis": "ÖSYM YDS Çeviri Standartları",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -447,8 +444,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Metinde açıkça ifade edilmektedir: 'Because scholars could readily read Ancient Greek, the stone provided the vital bilingual key...' (Eski Yunanca akademisyenler tarafından kolayca okunabildiği için, taş diğer dillerin çözülmesinde hayati bir anahtar işlevi görmüştür). Bu doğrudan B seçeneğine ('contained parallel inscriptions in a well-understood language alongside the unknown scripts') karşılık gelir.",
     "legalBasis": "ÖSYM YDS Paragraf Soru Formatı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -497,8 +494,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Elena boşluktan hemen sonra 'Precisely. If the physical storage nodes reside across multiple international jurisdictions...' (Kesinlikle. Eğer fiziksel depolama düğümleri birden fazla uluslararası yargı alanında bulunursa...) demektedir. Bu açıklama, Arthur'un 'Veri egemenliğinin (data sovereignty) küresel dağılım nedeniyle belirsizleştiğini mi ima ediyorsun?' (B şıkkı) sorusuna tam ve kusursuz bir yanıttır.",
     "legalBasis": "ÖSYM YDS Diyalog Formatı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -547,8 +544,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Metnin ana konusu: Derin deniz canlılarında biyolüminesans (kendi ışığını üretme) mekanizması ve işlevleridir (I, II, III ve V derin deniz ışık mekanizmalarını peş peşe açıklar). IV. cümlede ise konu aniden 'sığ su canlılarındaki zehir uyarıcı canlı renklere' (shallow-water vibrant coloration) kaymakta ve biyolüminesans zinciri kırılmaktadır. Dolayısıyla IV. cümle akışı bozar.",
     "legalBasis": "ÖSYM YDS Akışı Bozan Cümle Formatı",
     "difficulty": "orta",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
@@ -598,8 +595,8 @@ const QUESTIONS_AI_DATA = [
     "explanation": "Verilen cümle bir 'Inverted Third Conditional' (Devrik Tip 3 Koşul) cümlesidir: Şehir plancıları banliyö yolcularının bu benzeri görülmemiş akınını öngörmüş olsalardı, demiryolu koridorlarının kapasitesini düşürmezlerdi (Yani: öngöremedikleri için kapasiteyi düşürdüler). B seçeneği bu neden-sonuç ilişkisini eksiksiz paraphrase eder ('curtailed the capacity ... because they failed to foresee the massive surge').",
     "legalBasis": "ÖSYM YDS Restatement Formatı",
     "difficulty": "zor",
-    "source": "yds_ozgun",
-    "category": "YDS Özgün Soru Bataryası",
+    "source": "ai_yds_ornek",
+    "category": "YDS Örnek (AI)",
     "sourceBadgeLabel": "YDS ÖZGÜN · SEVİYE B2-C1",
     "examMeta": {
       "examType": "YDS Standart",
