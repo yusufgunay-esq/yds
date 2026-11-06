@@ -566,7 +566,7 @@ export function rota(opts = {}) {
   adimlar.push(akis);
   if (sonGun) {
     adimlar.push({ id: 'yarin', tur: 'bilgi', bilgi: true, baslik: 'Yarın sınav',
-      neden: "Saat 10.00'dan sonra binaya alınmıyorsun (PGM ilanı). Kimliğin ve sınava giriş belgen hazır olsun.", plan: 0, yapilan: 0 });
+      neden: "Sınav 10.15'te başlıyor; erken git. Kimliğin ve sınava giriş belgen hazır olsun.", plan: 0, yapilan: 0 });
   }
 
   // ---- durumlar ----

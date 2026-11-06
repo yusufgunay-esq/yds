@@ -21,8 +21,7 @@ import { buildGeminiPrompt } from './practice.js';
 import { arsivLabel, denemeLabel, arsivStartLabel, denemeStartLabel, SECTION } from '../labels.js';
 import { kurtarmaRadariHTML } from '../tuyolar.js';
 
-/** YDS: 80 soru / 180 dakika (Adalet Bakanlığı PGM, 27 Eylül 2026 ilanı:
- *  "cevaplama süresi 180 dakika"). Eskiden 150 yazıyordu. */
+/** YDS: 80 soru / 180 dakika (ÖSYM). Kaynaklarda 150 yazan da var; resmî kılavuzla teyit et. */
 const DURATION_MS = 180 * 60 * 1000;
 
 /** Bu kadar süre dururken "bitir"e basılırsa önce kuşkulu sorulara çağır. */
