@@ -215,7 +215,7 @@ function rotaHTML(r) {
   const satirlar = r.adimlar.map(a => {
     const st = a.bilgi ? 'info' : a.bitti ? 'done' : a === s ? 'now' : 'todo';
     const sayi = a.bilgi ? ''
-      : a.tur === 'deneme' ? (a.bitti ? 'bitti' : '120 soru')
+      : a.tur === 'deneme' ? (a.bitti ? 'bitti' : '80 soru')
         : a.sinirsiz ? `bugün ${a.yapilan} · sınırsız`
           : `${a.yapilan} / ${a.plan}`;
     const btn = a.bilgi || a.bitti || a === s ? ''
@@ -271,7 +271,7 @@ function sinavKarti(r) {
         <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">Saat 10.00'dan önce binada ol</div><div class="rota-meta">10.00'dan sonra binaya alınmıyor (PGM ilanı). Sınav 10.15'te başlıyor.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
         <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">Sabah son bakış: sayılar</div><div class="rota-meta">Notlar içinde Sayılar sekmesi, "Kendini sına". En fazla 20 dakika; yeni konu açma.</div></div><div class="rota-count"></div><div class="rota-act"><button class="btn btn-2 btn-s" data-view="notlar">Aç</button></div></div>
         <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">Kimlik ve sınava giriş belgesi</div><div class="rota-meta">Çıkmadan önce bir kez daha kontrol et.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
-        <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">120 soru · 155 dakika</div><div class="rota-meta">Soru başına ~75 saniye. Takıldığını işaretle geç, ikinci turda dön; boş bırakma.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
+        <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">80 soru · 180 dakika</div><div class="rota-meta">Soru başına ~135 saniye.  Takıldığını işaretle geç, ikinci turda dön; boş bırakma.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
       </div>
     </div>`;
 }
@@ -289,7 +289,7 @@ function diagnosisHTML(gap, worst, sig) {
       <div style="display:flex;align-items:baseline;gap:0.75rem;flex-wrap:wrap">
         <div style="font-size:1.15rem;font-weight:700;color:${gap.gap > 0 ? 'var(--no)' : 'var(--ok)'}">${gap.net} net</div>
         <div class="hint" style="margin:0">${gap.gap > 0
-          ? `84 net için <b style="color:var(--no)">${gap.gap} net açık</b>`
+          ? `${PASS_CORRECT} net için <b style="color:var(--no)">${gap.gap} net açık</b>`
           : 'Barajın üstünde — güvenlik payını büyüt'}</div>
         ${gap.pace ? `<span class="chip">~${gap.pace} sn/soru</span>` : ''}
       </div>

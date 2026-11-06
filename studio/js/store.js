@@ -13,9 +13,9 @@
 const KEY = 'yds_studio_v1';
 const SCHEMA = 1;
 
-/** Sınav: 2026-HMGS/2 */
+/** Sınav: YDS 2026/2 (tarihi ÖSYM kılavuzundan doğrula) */
 export const EXAM_DATE = new Date('2026-11-22T10:15:00');
-/** 120 soru, yanlış cezası yok → net = doğru sayısı. Baraj 70 puan = 84 doğru. */
+/** YDS: 80 soru, yanlış cezası yok → net = doğru sayısı. Puan = net × 1,25. Baraj 70 puan = 56 doğru. */
 export const EXAM_TOTAL = 80;
 export const PASS_CORRECT = 56;
 /** Soru başına hedef süre (saniye). Otomatikleşme eşiği. */
@@ -430,9 +430,9 @@ export function reconcilePastData(questionMap) {
               ex.correct = (ex.correct || 0) + 1;
               ex.wrong = Math.max(0, (ex.wrong || 0) - 1);
               ex.net = ex.correct;
-              const totalQ = ex.total || ex.map.length || 120;
+              const totalQ = ex.total || ex.map.length || EXAM_TOTAL;
               ex.points = Math.round((ex.correct / totalQ) * 1000) / 10;
-              ex.pass = (ex.correct >= 84);
+              ex.pass = (ex.correct >= PASS_CORRECT);
 
               if (oldB === 'kavram') ex.kavram = Math.max(0, (ex.kavram || 0) - 1);
               if (oldB === 'eksik') ex.eksik = Math.max(0, (ex.eksik || 0) - 1);
@@ -464,9 +464,9 @@ export function reconcilePastData(questionMap) {
               ex.correct = Math.max(0, (ex.correct || 0) - 1);
               ex.wrong = (ex.wrong || 0) + 1;
               ex.net = ex.correct;
-              const totalQ = ex.total || ex.map.length || 120;
+              const totalQ = ex.total || ex.map.length || EXAM_TOTAL;
               ex.points = Math.round((ex.correct / totalQ) * 1000) / 10;
-              ex.pass = (ex.correct >= 84);
+              ex.pass = (ex.correct >= PASS_CORRECT);
 
               if (oldB === 'sans') ex.sans = Math.max(0, (ex.sans || 0) - 1);
               if (newB === 'kavram') ex.kavram = (ex.kavram || 0) + 1;
@@ -498,9 +498,9 @@ export function reconcilePastData(questionMap) {
               ex.correct = (ex.correct || 0) + 1;
               ex.wrong = Math.max(0, (ex.wrong || 0) - 1);
               ex.net = ex.correct;
-              const totalQ = ex.total || ex.map.length || 120;
+              const totalQ = ex.total || ex.map.length || EXAM_TOTAL;
               ex.points = Math.round((ex.correct / totalQ) * 1000) / 10;
-              ex.pass = (ex.correct >= 84);
+              ex.pass = (ex.correct >= PASS_CORRECT);
 
               if (oldB === 'kavram') ex.kavram = Math.max(0, (ex.kavram || 0) - 1);
               if (oldB === 'eksik') ex.eksik = Math.max(0, (ex.eksik || 0) - 1);

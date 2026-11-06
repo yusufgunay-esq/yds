@@ -571,8 +571,8 @@ export function nextAction() {
       title: last ? 'Yeni bir deneme zamanı' : 'Önce bir deneme çöz',
       why: last
         ? `Son denemenden ${Math.round(examAge)} gün geçti. Netin ölçülmediği sürece bütün tahminler ölçülmemiş bir sabite dayanıyor.`
-        : 'Henüz hiç denemen yok. Net tahminlerinin tamamı varsayım; bir deneme girdiğin an hepsi yeniden hesaplanır. 120 soru, tek oturum, boş bırakmadan.',
-      cta: '120 soruluk denemeyi başlat',
+        : 'Henüz hiç denemen yok. Net tahminlerinin tamamı varsayım; bir deneme girdiğin an hepsi yeniden hesaplanır. 80 soru, 180 dakika, tek oturum, boş bırakmadan.',
+      cta: '80 soruluk denemeyi başlat',
       action: { view: 'exam', mode: 'start' },
       alts: buildAlts(['karma', 'review'])
     };
@@ -592,7 +592,7 @@ export function nextAction() {
   const gapInfo = examGap();
   const worst = gapInfo && gapInfo.gap > 0 ? worstExamSubjects(2) : [];
   const gapLead = gapInfo && gapInfo.gap > 0
-    ? `Son deneme netin ${gapInfo.net} (84 barajı için ${gapInfo.gap} net açık)`
+    ? `Son deneme netin ${gapInfo.net} (${PASS_CORRECT} net barajı için ${gapInfo.gap} net açık)`
       + (worst.length
         ? `; en çok ${worst[0].name} sızdırıyor (sınavda ${worst[0].examQ} soru, isabet %${Math.round(worst[0].acc * 100)})`
         : '')
@@ -638,7 +638,7 @@ function buildAlts(kinds) {
 /* ==========================================================================
    4. KARMA SET — sınavın kendi biçimi
    ----------------------------------------------------------------------
-   Neden ders bazlı değil: sınav 120 soruyu karışık soruyor. Ders ders
+   Neden ders bazlı değil: sınav 80 soruyu karışık soruyor. Ders ders
    çalışıldığında hangi kuralın uygulanacağı sorunun ÜSTÜNDE yazılı olur;
    sınavda yazmaz. Ayırt etme işi ancak harmanlanmış sette çalışılır
    (Brunmair & Richter 2019 meta-analizi, 59 çalışma: kural uygulamada
@@ -859,7 +859,7 @@ export const KARMA_VAIN_DAMP = 0.75;
  * uzun boşluk 151 soruydu, yani söz tutulmuyordu.
  */
 export const KARMA_STARVE_GAP = 45;
-/** Sınırın ölçeklendiği referans ders ağırlığı (120 soru / 20 ders). */
+/** Sınırın ölçeklendiği referans ders ağırlığı (80 soru / 10 soru tipi). */
 export const KARMA_STARVE_REF_EXAMQ = 6;
 /** Bu katın üstünde açlık KRİTİKTİR: slot sınırına bakılmaksızın sete girer. */
 export const KARMA_STARVE_CRIT = 2;
@@ -1417,7 +1417,7 @@ export function buildKarmaSet(count = 20, scope = 'core', opts = {}) {
 
 /* ==========================================================================
    NET / PUAN HESABI
-   YDS: yanlış cezası yok → net = doğru sayısı. Puan = doğru/120 × 100.
+   YDS: yanlış cezası yok → net = doğru sayısı. Puan = doğru/80 × 100 (net × 1,25).
    ========================================================================== */
 
 export function scoreOf(correct, total = 80) {

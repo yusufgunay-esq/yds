@@ -2,7 +2,7 @@
    بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
    رَبِّ يَسِّرْ وَلَا تُعَسِّرْ رَبِّ تَمِّمْ بِالْخَيْرِ
    ==========================================================================
-   views/exam.js — 120 SORULUK SINAV SİMÜLASYONU
+   views/exam.js — 80 SORULUK SINAV SİMÜLASYONU
    Gerçek ders dağılımı · geri sayım · boş bırakma · soru haritası
    Kural: YDS'de yanlış cezası yoktur → net = doğru. Asla boş bırakma.
    ========================================================================== */
@@ -263,7 +263,7 @@ export function render() {
                   <h4 style="font-size:0.95rem;font-weight:600;margin:0;color:var(--ink)">${esc(arsivLabel(r.id))}</h4>
                   ${lastPast ? `<span class="chip ${lastPast.pass ? 'accent' : ''}" style="font-size:0.72rem">${lastPast.net} net</span>` : ''}
                 </div>
-                <span style="font-size:0.82rem;color:var(--ink-2)">${r.count} soru · ${r.count <= 100 ? '130' : '155'} dakika</span>
+                <span style="font-size:0.82rem;color:var(--ink-2)">${r.count} soru · 180 dakika</span>
               </div>
               <button class="btn btn-2 btn-s" data-act="exam-start-real" data-source="${esc(r.id)}" style="align-self:flex-start">
                 ${lastPast ? 'Tekrar Çöz' : 'Sınavı Başlat'}
@@ -871,7 +871,7 @@ function listFor(r, f) {
   } else {
     res = all.filter(e => e.b === f);
   }
-  // Sınavdaki doğal soru sırasına (1..120) göre sıralanır:
+  // Sınavdaki doğal soru sırasına (1..80) göre sıralanır:
   // Asla bucket önceliğine göre atlama yapılmaz
   return res.sort((a, b) => a.no - b.no);
 }
@@ -1454,7 +1454,7 @@ export function exportStats() {
     title: r.label || 'Stüdyo Denemesi',
     date: r.at ? r.at.split('T')[0] : new Date().toISOString().split('T')[0],
     durationMinutes: Math.round((r.durationMs || 0) / 60000),
-    totalQ: r.total || 120,
+    totalQ: r.total || EXAM_TOTAL,
     correct: r.correct || 0,
     wrong: r.wrong || 0,
     empty: r.blank || 0,

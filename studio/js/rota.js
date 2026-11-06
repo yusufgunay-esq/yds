@@ -341,12 +341,12 @@ export function denemeSecimi() {
   const secenek = [];
   for (const r of pastExamList()) {
     const qs = pastExamQuestions(r.id);
-    if (qs.length < 100) continue;
+    if (qs.length < 70) continue;
     const g = qs.filter(q => gorulen.has(q.id)).length / qs.length;
     secenek.push({ kind: 'real', source: r.id, label: r.label, n: qs.length, gorulen: g, yapildi: yapilan.has(r.id) });
   }
   // Deneme kâğıtları (ör. Deneme 1): arşiv sınavı değil ama
-  // tam, blueprint'e sadık 120 soruluk kâğıt. Kaynak kimliği "deneme" içeren
+  // tam, blueprint'e sadık 80 soruluk kâğıt. Kaynak kimliği "deneme" içeren
   // ve en az 100 sorusu olan her kaynak bir aday kâğıttır.
   const kagit = new Map();
   for (const q of questionById.values()) {
@@ -355,19 +355,19 @@ export function denemeSecimi() {
     kagit.get(q.source).push(q);
   }
   for (const [src, qs] of kagit) {
-    if (qs.length < 100) continue;
+    if (qs.length < 70) continue;
     const g = qs.filter(q => gorulen.has(q.id)).length / qs.length;
     secenek.push({ kind: 'set', source: src, label: kagitAdi(src, qs[0]), n: qs.length, gorulen: g, yapildi: yapilan.has(src) });
   }
   const ai = aiQuestions();
-  if (ai.length >= 120) {
+  if (ai.length >= 80) {
     const g = ai.filter(q => gorulen.has(q.id)).length / ai.length;
-    secenek.push({ kind: 'ai', label: 'Yapay Zeka Denemesi', n: 120, gorulen: g, yapildi: yapilan.has('ai_hmgs') });
+    secenek.push({ kind: 'ai', label: 'Yapay Zeka Denemesi', n: 80, gorulen: g, yapildi: yapilan.has('ai_hmgs') });
   }
   const cekirdek = [...questionById.values()].filter(q => tierOf(q) !== TIER_ADV);
-  if (cekirdek.length >= 120) {
+  if (cekirdek.length >= 80) {
     const g = cekirdek.filter(q => gorulen.has(q.id)).length / cekirdek.length;
-    secenek.push({ kind: 'karma', label: 'Karma deneme', n: 120, gorulen: g, yapildi: false });
+    secenek.push({ kind: 'karma', label: 'Karma deneme', n: 80, gorulen: g, yapildi: false });
   }
   if (!secenek.length) return null;
   const maliyet = o => o.gorulen + (o.yapildi ? 1 : 0) - (o.kind === 'real' ? 0.1 : 0);
@@ -477,7 +477,7 @@ export function rota(opts = {}) {
         id: 'deneme', tur: 'deneme', baslik: 'Günün denemesi',
         neden: `${onceki} ${kagit} ${saatNotu}`,
         plan: 1, yapilan: 0, saat: saat < 10.25 ? ROTA.DENEME_SAAT : null,
-        cta: '120 soruluk denemeyi başlat', launch: { tur: 'deneme', secim: sec }
+        cta: '80 soruluk denemeyi başlat', launch: { tur: 'deneme', secim: sec }
       };
     }
   }

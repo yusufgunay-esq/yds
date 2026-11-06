@@ -514,11 +514,11 @@ practice.endSession();
 /* ---------- BARAJ METRİĞİ DOĞRU MU (eski hatanın regresyon testi) ---------- */
 
 section('BARAJ METRİĞİ REGRESYON TESTİ');
-const sc = engine.scoreOf(84, 120);
-ok('84 doğru = 70.0 puan (baraj)', sc.points === 70, `${sc.points}`);
-ok('84 doğru barajı geçiyor', sc.pass === true);
-ok('83 doğru barajı geçmiyor', engine.scoreOf(83, 120).pass === false);
-ok('120 doğru = 100 puan', engine.scoreOf(120, 120).points === 100);
+const sc = engine.scoreOf(56, 80);
+ok('56 doğru = 70.0 puan (baraj)', sc.points === 70, `${sc.points}`);
+ok('56 doğru barajı geçiyor', sc.pass === true);
+ok('55 doğru barajı geçmiyor', engine.scoreOf(55, 80).pass === false);
+ok('80 doğru = 100 puan', engine.scoreOf(80, 80).points === 100);
 ok('baraj kümülatif doğruya DEĞİL deneme netine bakıyor',
   store.lastExam().net === res.correct);
 

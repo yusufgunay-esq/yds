@@ -34,7 +34,8 @@ async function fetchProfil() {
 }
 
 function renderProfileContent(p) {
-  if (!p) {
+  /* Sahte varsayılan sayı gösterme: gerçek projeksiyon verisi yoksa kart hesaplanıyor durumunda kalır. */
+  if (!p || !p.projections) {
     return `<div class="card" style="margin-bottom:1.5rem;padding:1rem;">
       <p class="hint">Bilişsel profil verisi hesaplanıyor...</p>
     </div>`;
@@ -53,11 +54,11 @@ function renderProfileContent(p) {
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;padding-bottom:1rem;border-bottom:1px solid var(--border);">
         <div>
           <div style="font-size:0.8rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Ölçülen Kısım</div>
-          <div style="font-size:1.3rem;font-weight:700;color:var(--ink-1);margin-top:0.2rem">56 Soru <span style="font-size:0.95rem;font-weight:500;color:var(--ok)">(${proj.measured_net || 42.8} net)</span></div>
+          <div style="font-size:1.3rem;font-weight:700;color:var(--ink-1);margin-top:0.2rem">${proj.measured_q != null ? proj.measured_q : '–'} Soru <span style="font-size:0.95rem;font-weight:500;color:var(--ok)">(${proj.measured_net != null ? proj.measured_net : '–'} net)</span></div>
         </div>
         <div>
           <div style="font-size:0.8rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Ölçülmeyen Karanlık Kısım</div>
-          <div style="font-size:1.3rem;font-weight:700;color:var(--warn);margin-top:0.2rem">64 Soru <span style="font-size:0.85rem;font-weight:400;color:var(--ink-3)">(sıfır kayıt)</span></div>
+          <div style="font-size:1.3rem;font-weight:700;color:var(--warn);margin-top:0.2rem">${proj.unmeasured_q != null ? proj.unmeasured_q : '–'} Soru <span style="font-size:0.85rem;font-weight:400;color:var(--ink-3)">(sıfır kayıt)</span></div>
         </div>
         <div>
           <div style="font-size:0.8rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Bitirilebilirlik Sınırı</div>
@@ -66,31 +67,31 @@ function renderProfileContent(p) {
       </div>
 
       <div style="margin-top:1.25rem;">
-        <div style="font-size:0.85rem;font-weight:600;color:var(--ink-2);margin-bottom:0.75rem">Bilinmeyen 64 Soruda İsabet Senaryoları</div>
+        <div style="font-size:0.85rem;font-weight:600;color:var(--ink-2);margin-bottom:0.75rem">Ölçülmeyen Soruda İsabet Senaryoları</div>
         <div class="grid grid-4" style="gap:0.75rem">
           <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem;text-align:center">
             <div style="font-size:0.75rem;color:var(--ink-3)">Taban %35 İsabet</div>
-            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['35'] || 65.2} net</div>
-            <div style="font-size:0.7rem;color:var(--no)">Baraj altı (-18,8)</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['35'] != null ? sc['35'] : '–'} net</div>
+            <div style="font-size:0.7rem;color:var(--no)"></div>
           </div>
           <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem;text-align:center">
             <div style="font-size:0.75rem;color:var(--ink-3)">Mezun %45 İsabet</div>
-            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['45'] || 71.6} net</div>
-            <div style="font-size:0.7rem;color:var(--no)">Baraj altı (-12,4)</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['45'] != null ? sc['45'] : '–'} net</div>
+            <div style="font-size:0.7rem;color:var(--no)"></div>
           </div>
           <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem;text-align:center">
             <div style="font-size:0.75rem;color:var(--ink-3)">İyi %55 İsabet</div>
-            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['55'] || 78.0} net</div>
-            <div style="font-size:0.7rem;color:var(--warn)">Baraj altı (-6,0)</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['55'] != null ? sc['55'] : '–'} net</div>
+            <div style="font-size:0.7rem;color:var(--warn)"></div>
           </div>
           <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:0.75rem;text-align:center">
             <div style="font-size:0.75rem;color:var(--ink-3)">Güçlü %60 İsabet</div>
-            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['60'] || 81.2} net</div>
-            <div style="font-size:0.7rem;color:var(--warn)">Baraj sınırında (-2,8)</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--ink-1);margin:0.25rem 0">${sc['60'] != null ? sc['60'] : '–'} net</div>
+            <div style="font-size:0.7rem;color:var(--warn)"></div>
           </div>
         </div>
         <div style="font-size:0.8rem;color:var(--ink-3);margin-top:0.6rem;text-align:right">
-          Baraj 84 net için bilinmeyenlerde gereken isabet: <strong>%${proj.required_accuracy_for_84 || 64.4}</strong> | Hedef 96 net: <strong>%${proj.required_accuracy_for_96 || 83.1}</strong>
+          Baraj ${PASS_CORRECT} net için bilinmeyenlerde gereken isabet: <strong>${proj.required_accuracy_for_pass != null ? '%' + proj.required_accuracy_for_pass : '–'}</strong>
         </div>
       </div>
 
@@ -113,7 +114,7 @@ function renderProfileContent(p) {
       <div style="margin-top:1.25rem;background:var(--bg-card);border:1.5px solid var(--accent);border-radius:8px;padding:1rem;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">
           <span style="font-size:0.75rem;font-weight:700;letter-spacing:0.05em;color:var(--accent);text-transform:uppercase">En Yüksek Getirili Tek Eylem</span>
-          <span style="font-size:0.85rem;font-weight:700;color:var(--ok);background:rgba(34,197,94,0.1);padding:2px 8px;border-radius:4px">+${act.net_getiri || 32.8} Net Potansiyeli</span>
+          <span style="font-size:0.85rem;font-weight:700;color:var(--ok);background:rgba(34,197,94,0.1);padding:2px 8px;border-radius:4px">+${act.net_getiri != null ? act.net_getiri : '–'} Net Potansiyeli</span>
         </div>
         <div style="font-size:0.95rem;font-weight:700;color:var(--ink-1);margin-bottom:0.25rem">${esc(act.baslik || '')}</div>
         <div style="font-size:0.85rem;color:var(--ink-2);line-height:1.4">${esc(act.gerekce || '')}</div>
