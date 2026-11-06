@@ -7,7 +7,7 @@
    Bu sayede yeniden render sonrası handler bağlamak gerekmez.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { $, $$, toast } from './ui.js';
@@ -197,7 +197,7 @@ document.addEventListener('click', async e => {
     case 'pratik-sonsuz':       if (typeof pratik.sonsuzaGec === 'function') pratik.sonsuzaGec(); break;
     case 'pratik-sonsuz-basla': pratik.sonsuzBasla(); break;
 
-    /* --- ödevler sekmesi (koç görevleri, HMGS Stüdyo şeması) --- */
+    /* --- ödevler sekmesi (koç görevleri, YDS Stüdyo şeması) --- */
     case 'odev-yenile': odevler.fetchTasks(true); break;
     case 'odev-quiz': {
       const subj = el.dataset.subj || '';
@@ -273,19 +273,19 @@ document.addEventListener('click', async e => {
       break;
     }
     case 'practice-hmgs-benzeri':
-      if (practice.startSession({ mode: 'hmgsBenzeri', count: 50, customLabel: 'HMGS Benzeri Sorular' })) show('practice');
+      if (practice.startSession({ mode: 'hmgsBenzeri', count: 50, customLabel: 'YDS Benzeri Sorular' })) show('practice');
       break;
     case 'practice-hmgs-benzeri-all':
-      if (practice.startSession({ mode: 'hmgsBenzeri', count: 999, customLabel: 'HMGS Benzeri Tüm Havuz' })) show('practice');
+      if (practice.startSession({ mode: 'hmgsBenzeri', count: 999, customLabel: 'YDS Benzeri Tüm Havuz' })) show('practice');
       break;
     case 'start-hmgs-benzeri':
-      if (practice.startSession({ mode: 'hmgsBenzeri', count: 20, customLabel: 'HMGS Benzeri Hızlı Pratik (20 Soru)' })) show('practice');
+      if (practice.startSession({ mode: 'hmgsBenzeri', count: 20, customLabel: 'YDS Benzeri Hızlı Pratik (20 Soru)' })) show('practice');
       break;
     case 'practice-pastexam':
       if (practice.startSession({ mode: 'pastExam', count: 999 })) show('practice');
       break;
     case 'practice-core-karma':
-      if (akim.start({ scope: 'core', label: 'HMGS Çekirdek Karma' })) show('akim');
+      if (akim.start({ scope: 'core', label: 'YDS Çekirdek Karma' })) show('akim');
       break;
     case 'practice-all-karma':
       if (akim.start({ scope: 'all', label: 'Tüm Havuz Karma (İleri Dahil)' })) show('akim');
@@ -590,7 +590,7 @@ function renderDriveConnectScreen() {
           </div>
         </div>
         <h2 style="font-size:1.25rem;font-weight:700;color:var(--ink);margin-bottom:0.5rem">
-          HMGS Stüdyo
+          YDS Stüdyo
         </h2>
         <p style="color:var(--ink-2);font-size:0.9rem;line-height:1.5;margin-bottom:1.75rem">
           Çalışmaya başlamak için kütüphanenizi eşitleyin.

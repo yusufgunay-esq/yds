@@ -4,7 +4,7 @@
    O(n) tam tarama yerine hazır Map'ler.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { loadMasterVault } from './vault-client.js';
@@ -21,7 +21,7 @@ import { setVaultLabels, arsivLabel, denemeLabel } from './labels.js';
    vatandaşlık/vize/tenfiz "milletlerarasi" etiketli ama MÖHUK bloğunda).
    Hatalı etiketten türetilen tablo 7 derste resmî dağılımdan sapıyordu.
 
-   DOĞRU KAYNAK: HMGS Yönetmeliği (15 Ocak 2025 değişikliği) yüzde dağılımı.
+   DOĞRU KAYNAK: YDS Yönetmeliği (15 Ocak 2025 değişikliği) yüzde dağılımı.
    Aynı değerler `topics.js` → `SUBJECTS_DATA[].questionCount` alanında BİREBİR
    duruyor ve iki sınavın kitapçık numara aralıklarıyla da örtüşüyor. Tek
    doğruluk kaynağı o alandır; buradaki tablo onun aynasıdır ve
@@ -338,12 +338,12 @@ export function integrity() {
    HEDEF VE KATMAN
    ----------------------------------------------------------------------
    examTarget iki etiket taşıyor: 'hmgs_core' ve 'hmgs'.
-   İkisi de HMGS havuzudur; tek ölçüt aşağıdaki isCoreTarget'tır.
+   İkisi de YDS havuzudur; tek ölçüt aşağıdaki isCoreTarget'tır.
 
    Katman (tier) sınav YAKINLIĞIDIR, zorluk değil. Dört katman:
      1 = çıkmış arşiv sorular   (category 'Çıkmış Sorular')
      2 = deneme setleri         (deneme kaynağı)
-     3 = HMGS benzeri (AI)      (source ai_* / id hmgsai_*)
+     3 = YDS benzeri (AI)      (source ai_* / id hmgsai_*)
          MODEL ÖNCELİĞİ: Opus > Sonnet > Gemini > etiketsiz.
      4 = ileri düzey banka      (kalan sorular; HMGS'den daha derin düzey)
    Soru seçimi bu sıraya göre yapılır (engine.js: candidatesOf/secByTier).
@@ -359,7 +359,7 @@ export function tierOf(q) {
   return TIER_ADV;
 }
 
-/** HMGS benzeri (AI) sorular arasında model önceliği (küçük = önce).
+/** YDS benzeri (AI) sorular arasında model önceliği (küçük = önce).
  *  Kullanıcı kararı, 23 Eylül 2026: "ai sorularında da sıralama opus sonnet
  *  ve gemini olsun." Sorunun kendi `model` alanı ya da `examMeta.model`
  *  okunur (questions_ai.js: "Opus 5" / "Sonnet 5" / "3.8 Flash"). Yalnız
@@ -372,7 +372,7 @@ export function aiModelRank(q) {
   return 3; // etiketsiz/bilinmeyen model — en sona
 }
 
-/** Soru HMGS havuzunda mı? 'hmgs_core' ve 'hmgs' aynı havuzdadır. */
+/** Soru YDS havuzunda mı? 'hmgs_core' ve 'hmgs' aynı havuzdadır. */
 export const isCoreTarget = q => !!q && String(q.examTarget || '').startsWith('hmgs');
 
 export const topicsOf = id => topicsBySubject.get(id) || [];
@@ -403,7 +403,7 @@ export function filterQuestions(pool, scope = 'core') {
   return pool.filter(isCoreTarget);
 }
 
-/** HMGS Benzeri (AI Üretimi) soruları döndürür. */
+/** YDS Benzeri (AI Üretimi) soruları döndürür. */
 export function aiQuestions(subjectId = null) {
   const list = QUESTIONS.filter(q => /ai_|ai-|hmgsai/i.test(String(q.source || '')) || String(q.id).startsWith('hmgsai_'));
   if (subjectId) return list.filter(q => q.subjectId === subjectId);
@@ -470,9 +470,9 @@ export function buildExamSet(onlyTagged = false, scope = 'core', seen = null) {
 }
 
 /**
- * HMGS Benzeri (AI) havuzundan resmi dağılıma göre 120 soruluk deneme seti kurar.
+ * YDS Benzeri (AI) havuzundan resmi dağılıma göre 120 soruluk deneme seti kurar.
  * 20 resmi ders dağılımına sadık kalınır, eksik kalan birkaç soru çekirdek havuzdan tamamlanır.
- * Sıra: görülmemiş HMGS benzeri → görülmemiş çekirdek dolgu → görülmüş (en eski önce).
+ * Sıra: görülmemiş YDS benzeri → görülmemiş çekirdek dolgu → görülmüş (en eski önce).
  */
 export function buildAiExamSet(seen = null) {
   const picked = [];
@@ -503,9 +503,9 @@ export function buildAiExamSet(seen = null) {
  * Her ders kotası, kullanıcının kesin talimatı olan katman hiyerarşisiyle doldurulur:
  *   1. Kullanıcının HİÇ GÖRMEDİĞİ sorular önceliklidir (!seen.has(q.id)).
  *   2. Katman Sırası (Tier):
- *      - Tier 1: Gerçek HMGS Çıkmış Soruları (category === 'Çıkmış Sorular' veya source hmgs_*)
- *      - Tier 2: HMGS Denemeleri (source deneme_*)
- *      - Tier 3: Yapay Zeka HMGS Soruları (questions_ai / source ai_* veya id hmgsai_*)
+ *      - Tier 1: Gerçek YDS Çıkmış Soruları (category === 'Çıkmış Sorular' veya source hmgs_*)
+ *      - Tier 2: YDS Denemeleri (source deneme_*)
+ *      - Tier 3: Yapay Zeka YDS Soruları (questions_ai / source ai_* veya id hmgsai_*)
  *      - Tier 4: Soru Bankaları ve Çalışma Havuzu
  *   3. Bir derste görülmemiş soru kalmadıysa, yine aynı katman sırasıyla
  *      en eski çözülen (unutmaya en yakın) sorulardan tamamlanarak 120 soru firesiz kurulur.
@@ -520,7 +520,7 @@ export function buildAlgorithmicExamSet(seen = null, lastWrong = null) {
     unseen: 0,
     seen: 0,
     tier1: 0, // Gerçek HMGS
-    tier2: 0, // HMGS Denemeleri
+    tier2: 0, // YDS Denemeleri
     tier3: 0, // Yapay Zeka
     tier4: 0  // Soru Bankası
   };

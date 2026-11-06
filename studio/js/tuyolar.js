@@ -1,7 +1,6 @@
 /* ==========================================================================
    tuyolar.js : Soru tipine özel sınav radarı ve ampirik kurtarma tüyoları
-   Kaynak: 4 gerçek sınav kitapçığının (460 soru: 2024E, 2025M, 2025E, 2026N)
-   tamamı taranarak ölçülen kök yapıları ve çeldirici tuzakları.
+   Kaynak: çıkmış YDS sorularında görülen kök yapıları için genel yöntem ipuçları.
    Ders bazlı harf oranları 25 Eylül 2026'da ÇIKARILDI: dört sınavda sınandı, tutmuyor
    (diğer üç sınavdan seçilen favori harf dördüncüde %16,9 isabet, rastgele %20).
    Burada yalnız dört sınavın dördünde de tutan oranlar durur.
@@ -122,28 +121,29 @@ function notKartiHTML(q) {
 const OLUMSUZ_A_ISTISNA = new Set(['ceza_hukuku']);
 
 function kokTaktigi(t, sec, sId = '') {
+  /* YDS: ölçülmüş istatistik iddiası yok; yalnız genel, her zaman geçerli yöntem ipuçları. */
   if (t.onculu) {
     return {
       etiket: 'Öncüllü Soru (I, II, III)',
-      taktik: '78 öncüllü sorunun 53\'ünde (%68) doğru cevap iki öncül; "I, II ve III" yalnız 6 kez (%8). Dört sınavın dördünde de böyle. Bir öncülü kesin elersen soru iki şıkka iner.'
+      taktik: 'Bir öncülü kesin elersen şıkların yarısı düşer. Önce kesin yanlış olanı bul, kalan şıklarda diğerlerini sına.'
     };
   }
   if (t.olumsuz) {
-    const taktik = OLUMSUZ_A_ISTISNA.has(sId)
-      ? 'Ceza Hukukunda bu geçerli değil, A yine olası bir cevap.'
-      : "İki şık arasında kalıp biri A'ysa diğerini seç.";
-    return { etiket: 'Olumsuz Kök ("...değildir / ...yanlıştır")', taktik };
+    return {
+      etiket: 'Olumsuz Kök ("...değildir / ...yanlıştır")',
+      taktik: 'Kök olumsuzsa doğru şıkkı değil, metinle ya da kuralla çelişen şıkkı ara. Her şıkkı "doğru mu" diye tek tek işaretleyip geriye kalanı seç.'
+    };
   }
   if (t.kisaSik || t.cokKisaSik) {
     return {
-      etiket: 'Kısa Şıklar (Süre / Sayı / Merci)',
-      taktik: 'Sınavın %28\'inde şıklar 12 karakterden kısadır. Çeldiriciler birbirine çok yakın kanun eşikleridir (7 gün / 10 gün; 15 gün / 30 gün; 1 yıl / 2 yıl). Hangi somut işlemin süresi sorulduğunu ve süre başlangıç anını (tebliğ mi, öğrenme mi) netleştir.'
+      etiket: 'Kısa Şıklar (Tek Sözcük Farkı)',
+      taktik: 'Kısa şıklar çoğu kez tek bir bağlaç, edat ya da zaman farkıdır. Boşluğun önünü ve sonrasını birlikte oku; cümlenin geri kalanı hangi yapıyı bekliyor?'
     };
   }
   if (t.olay) {
     return {
-      etiket: 'Olay ve Pratik Vaka Kurgusu',
-      taktik: 'Olay örgüsündeki kişi adları ve detaylar dikkat dağıtmak içindir. Olayı tek hukuki soruya indirge: Kim, kime karşı, hangi hukuki sebebe ve süreye dayanarak talepte bulunuyor?'
+      etiket: 'Uzun Bağlam Sorusu',
+      taktik: 'Ayrıntılar dikkat dağıtabilir. Sorunun tam olarak ne sorduğunu tek cümleyle yaz, sonra şıkları metindeki cümleyle doğrula.'
     };
   }
   if (t.kalip) {
@@ -153,8 +153,8 @@ function kokTaktigi(t, sec, sId = '') {
     };
   }
   return {
-    etiket: 'Düz Bilgi ve Mevzuat Kökü',
-    taktik: 'Tek başına en uzun şık 395 sorunun yalnız 64\'ünde (%16) doğru; dört sınavda da %14-18 arası. Uzun diye seçme.'
+    etiket: 'Düz Bilgi Kökü',
+    taktik: 'En uzun şık otomatik doğru değildir. Her şıkkı kurala ya da metne göre ayrı ayrı sına.'
   };
 }
 
@@ -184,7 +184,7 @@ export function kurtarmaRadariHTML({ q, chosen, ok, sec = 0, isReview = false, i
       <div class="radar-head">
         <div class="radar-title-group">
           <span class="radar-title">Çıkmış Sınav Radarı</span>
-          <span class="radar-badge">4 Sınav · 460 Soru Verisi</span>
+          <span class="radar-badge">Çıkmış YDS Soruları</span>
         </div>
         <span class="radar-status ${fastWrong ? 'fast' : isMarked ? 'marked' : ''}">${esc(badgeText)}</span>
       </div>

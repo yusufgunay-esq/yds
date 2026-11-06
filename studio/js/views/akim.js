@@ -18,13 +18,13 @@
    pop-up yok, patlama yok; bırakmak istemeyeyim"). Üç değişiklik:
    1. BAHİS: şık seç → Eminim / Sanırım / Mantıkla. Ödül tahmin hatası.
       (En alt düzey eski "Mantık" rozetinin yerine geçti; rozet kaldırıldı.)
-   2. HARİTA: 650 HMGS karesi, yanan kare sönmez (engine.hmgsMap).
+   2. HARİTA: 650 YDS karesi, yanan kare sönmez (engine.ydsMap).
    3. SÜRTÜNME: doğruluğu yargılayan akış ölçeri, düşük isabette zorla
       açılan mola perdesi ve kırmızıya dönen saat kaldırıldı; yerine 10
       soruluk tur noktaları ve ince, nötr bir zaman çizgisi geldi.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { esc, rich, richBlock, splitStem, fmtSec, stripEmoji, $, toast } from '../ui.js';
@@ -32,8 +32,8 @@ import { subjectName, topicById, tierOf } from '../data.js';
 import { recordAnswer, markLastAnswerAttention, save, saveSession, state, TARGET_SEC } from '../store.js';
 import * as seans from '../seans.js';
 import {
-  scheduleAfterAnswer, flowFeed, flowFeedDers, dersDurumu, flowReinforce, flowMilestone, hmgsCoverage,
-  hmgsMap, hmgsMapRow, tileState, answersSincePrev, calibration, CONF,
+  scheduleAfterAnswer, flowFeed, flowFeedDers, dersDurumu, flowReinforce, flowMilestone, ydsCoverage,
+  ydsMap, ydsMapRow, tileState, answersSincePrev, calibration, CONF,
   FLOW_REFILL_AT, FLOW_REINFORCE_DELAY, FLOW_BATCH
 } from '../engine.js';
 import { premiseHTML, optionRowHTML, toggleOption, togglePremise } from '../elim.js';
@@ -58,7 +58,7 @@ export function currentQuestion() { return A && A.queue[0] || null; }
  * @param {{scope?:string, label?:string}} opts  scope: 'core' | 'all' (buildKarmaSet'e
  *   geçer — practice-all-karma gibi çağrılar ileri/ileri havuz havuzunu da ister).
  *   label: üst şeritte görünen isim — hangi kapıdan girildiğini kullanıcıya söyler
- *   (ör. "HMGS Çekirdek Karma"), akış davranışını değiştirmez, tek kaynak yine karma motoru.
+ *   (ör. "YDS Çekirdek Karma"), akış davranışını değiştirmez, tek kaynak yine karma motoru.
  */
 export function start(opts = {}) {
   const scope = opts.scope || 'core';
@@ -165,7 +165,7 @@ export function render() {
         <div class="q-strip-center">${roundHTML()}</div>
         <div class="q-strip-right">
           <span id="akim-break-slot">${breakChipHTML()}</span>
-          <span class="akim-map-chip" id="akim-map-chip" title="HMGS haritası: yanan kare / toplam (arşiv + HMGS benzeri)">${mapChipText()}</span>
+          <span class="akim-map-chip" id="akim-map-chip" title="YDS haritası: yanan kare / toplam (arşiv + YDS benzeri)">${mapChipText()}</span>
           <button class="icon-btn" data-act="toggle-font-size" title="Metin Boyutunu Değiştir" aria-label="Metin boyutu">
             <span style="font-family:var(--sans);font-size:0.72rem;font-weight:700">A±</span>
           </button>
@@ -254,7 +254,7 @@ function roundHTML() {
 }
 
 function mapChipText() {
-  const m = hmgsMap();
+  const m = ydsMap();
   return `<b>${m.lit}</b><span class="akim-map-of">/${m.total}</span>`;
 }
 
@@ -275,7 +275,7 @@ export function takeBreak() {
 }
 
 function mapRowHTML(subjectId, nowId, justSealed) {
-  const row = hmgsMapRow(subjectId);
+  const row = ydsMapRow(subjectId);
   if (!row) return '';
   const tiles = row.tiles.map(t =>
     `<i class="mt ${t.s}${t.id === nowId ? ' now' : ''}${t.tier === 2 ? ' t2' : ''}"></i>`).join('');
@@ -286,12 +286,12 @@ function mapRowHTML(subjectId, nowId, justSealed) {
       <span class="akim-maprow-n"><b>${row.lit}</b> / ${row.total}${row.open ? ` · <span class="akim-open-n">${row.open} bekliyor</span>` : ''}</span>
     </div>
     <div class="akim-tiles">${tiles}</div>
-    ${justSealed ? `<div class="akim-sealed-line">Bu dersin HMGS soruları tamamen yandı.</div>` : ''}
+    ${justSealed ? `<div class="akim-sealed-line">Bu dersin YDS soruları tamamen yandı.</div>` : ''}
   </div>`;
 }
 
 function fullMapHTML(highlight = new Set()) {
-  const m = hmgsMap();
+  const m = ydsMap();
   if (!m.total) return '';
   const rows = m.rows.map(r => {
     const tiles = r.tiles.map(t =>
@@ -320,7 +320,7 @@ function fullMapHTML(highlight = new Set()) {
 function landingHTML() {
   return `<div class="wrap-read akim-landing">
     <h1 class="page">Akış</h1>
-    <p class="page-sub">Her kare bir HMGS sorusu. Doğru çözüp oturttuğun kare yanar ve bir daha sönmez;
+    <p class="page-sub">Her kare bir YDS sorusu. Doğru çözüp oturttuğun kare yanar ve bir daha sönmez;
       gelmediğin gün hiçbir şey kaybolmaz.</p>
     ${dersSeciciHTML()}
     <div class="akim-how">
@@ -569,7 +569,7 @@ function finishAnswer(q, chosen, row, sched, ms, before) {
   let sealed = false;
   if (lit) {
     A.litIds.add(q.id);
-    const r = hmgsMapRow(q.subjectId);
+    const r = ydsMapRow(q.subjectId);
     if (r && r.lit === r.total && !A.sealed.has(q.subjectId)) { A.sealed.add(q.subjectId); sealed = true; }
   }
   const gap = sched && sched.kind === 'mezun' ? answersSincePrev(q.id) : null;
@@ -747,14 +747,14 @@ function paintResult(q, chosen, row, sched, ms) {
 
 /* ---------- sorunun kaynağı ----------
    Akış 18 Eylül'de practice.js'ten ayrılırken practice'teki "Kaynak" satırı
-   buraya taşınmamıştı; kullanıcı çözdüğü sorunun arşiv mı, HMGS benzeri
+   buraya taşınmamıştı; kullanıcı çözdüğü sorunun arşiv mı, YDS benzeri
    mi, ileri havuz mı olduğunu göremiyordu (19 Eylül 2026 şikâyeti).
    Cevaptan ÖNCE gösterilmez: sınavda da yazmıyor. */
 function sourceChip(q) {
   const t = tierOf(q);
   if (t === 1) return '<span class="chip accent" title="Arşiv sınav sorusu">Arşiv sorusu</span>';
-  if (t === 2) return '<span class="chip" title="Gerçek sınavların biçimiyle üretilmiş soru">HMGS benzeri</span>';
-  return '<span class="chip" title="İleri düzey soru havuzu; HMGS düzeyinin üstünde">İleri havuz</span>';
+  if (t === 2) return '<span class="chip" title="Gerçek sınavların biçimiyle üretilmiş soru">YDS benzeri</span>';
+  return '<span class="chip" title="İleri düzey soru havuzu; YDS düzeyinin üstünde">İleri havuz</span>';
 }
 function sourceText(q) {
   const t = tierOf(q);
@@ -763,24 +763,24 @@ function sourceText(q) {
     const no = q.qNumber ? ` · ${q.qNumber}. soru` : '';
     return (label || 'arşiv sınav sorusu') + no;
   }
-  if (t === 2) return 'HMGS benzeri (gerçek sınav biçiminde üretilmiş)';
+  if (t === 2) return 'YDS benzeri (gerçek sınav biçiminde üretilmiş)';
   return label || 'İleri havuz';
 }
 
 /** Kapanış satırı için düz metin. */
 function coverageLine() {
-  const c = hmgsCoverage();
+  const c = ydsCoverage();
   if (!c.real.total && !c.similar.total) return '';
-  return `Gördüğün HMGS soruları: arşiv ${c.real.seen} / ${c.real.total} · HMGS benzeri ${c.similar.seen} / ${c.similar.total}.`;
+  return `Gördüğün YDS soruları: arşiv ${c.real.seen} / ${c.real.total} · YDS benzeri ${c.similar.seen} / ${c.similar.total}.`;
 }
 
-/** "Kaç HMGS sorusu gördüm" satırı. */
+/** "Kaç YDS sorusu gördüm" satırı. */
 export function coverageHTML() {
-  const c = hmgsCoverage();
+  const c = ydsCoverage();
   if (!c.real.total && !c.similar.total) return '';
   return `<p class="hint" style="margin:0.5rem 0 0">
-    Gördüğün HMGS soruları: arşiv <b>${c.real.seen} / ${c.real.total}</b> ·
-    HMGS benzeri <b>${c.similar.seen} / ${c.similar.total}</b>
+    Gördüğün YDS soruları: arşiv <b>${c.real.seen} / ${c.real.total}</b> ·
+    YDS benzeri <b>${c.similar.seen} / ${c.similar.total}</b>
   </p>`;
 }
 
@@ -942,7 +942,7 @@ function finalizeRun() {
     milestones: new Set(A.milestones.map(m => m.split(':')[1])).size,
     litGain: A.litIds.size,
     litIds: new Set(A.litIds),
-    openNow: hmgsMap().open,
+    openNow: ydsMap().open,
     calib: calibration(done),
     hintN: done.filter(r => r.conf === 'hint').length,
     escapes: saat.escapes ?? 0,

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   views/notlar.js : HMGS notları
+   views/notlar.js : YDS notları
    Üç yüz: Dersler (kart ızgarası → ders sayfası), Sayılar (kendini sına),
    Taktik (sınav iskeleti). Olaylar kendi host'unda, data-na ile yakalanır;
    main.js'teki data-act akışına karışmaz.
@@ -37,10 +37,8 @@ function seg() {
 const TIK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 
 const KISA = {
-  anayasa: 'Anayasa', aymyargi: 'Anayasa Yargısı', idare: 'İdare', iyuk: 'İYUK', medeni: 'Medeni',
-  borclar: 'Borçlar', ticaret: 'Ticaret', hmk: 'HMK', icra: 'İcra İflas', ceza: 'Ceza', cmk: 'CMK',
-  is: 'İş', vergi: 'Vergi', avukatlik: 'Avukatlık', felsefe: 'Felsefe', tarih: 'Hukuk Tarihi',
-  milletlerarasi: 'Milletlerarası', mohuk: 'MÖHUK', genelkamu: 'Genel Kamu'
+  kelime: 'Kelime', dilbilgisi: 'Gramer', cloze_test: 'Cloze', cumle_tamamlama: 'Cümle Tam.', ceviri: 'Çeviri',
+  okuma_parcalari: 'Okuma', diyalog: 'Diyalog', es_anlam: 'Eş Anlam', paragraf_tamamlama: 'Paragraf', akisi_bozan: 'Akışı Bozan'
 };
 const OKU_DERS = DERSLER.filter(d => HAP.some(h => h.d === d.id));
 const dersKart = id => HAP.filter(h => h.d === id);
@@ -141,7 +139,7 @@ function bas() {
     <p class="nt-eyebrow">Son okuma</p>
     <h1 class="nt-title">Notlar</h1>
     <p class="nt-sub">${ui.mod === 'oku'
-      ? 'Dört sınavın en çok sorduğu konular, sınav sırasıyla.'
+      ? 'En çok sorulan konular, sınav sırasıyla.'
       : 'Dört sınav, 460 soru. Ne çıkıyor, nerede tuzak var, hangi sayı sorulur.'}</p>
     ${seg()}
   </header>`;

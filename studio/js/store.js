@@ -7,7 +7,7 @@
    Türetilmiş her metrik (başarı, hız, mastery) bu ham kayıttan hesaplanır.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 const KEY = 'yds_studio_v1';

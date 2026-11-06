@@ -195,3 +195,28 @@ export const DERSLER = [
     sinavda: 'Genellikle III. veya IV. cümle bozar; ama I. cümlenin de bozabildiğini unutma.'
   }
 ];
+
+/* Taktik sayfası: YDS sınavının tamamına dair genel kurallar (ölçülmüş istatistik iddiası yok) */
+export const TAKTIK = [
+  { b: 'Boş bırakma', t: 'Yanlış doğruyu götürmüyor. Son dakikada boş kalanların hepsini işaretle.' },
+  { b: 'Soru başına ~135 saniye', t: '80 soru, 180 dakika: ortalama 135 saniye. Kelime ve gramer sorularını hızlı bitirip kazandığın süreyi okumaya aktar.' },
+  { b: 'Okuma en büyük blok', t: '20 soru, sınavın dörtte biri. Önce soru kökünü oku, sonra metni tara; cevabı metindeki cümleyle doğrula.' },
+  { b: 'Takıldığını işaretle, geç', t: 'Bir soruda 2 dakikayı aşma. İşaretle, ilerle, ikinci turda dön.' },
+  { b: 'Bağlaç ve edat önce', t: 'Dilbilgisi, cloze ve cümle tamamlamada boşluğun önündeki ve sonundaki bağlaç ya da edat çoğu zaman cevabı daraltır.' },
+  { b: 'Harf tahmini yapma', t: 'Kararsızlıkta şıkları eleyerek git; son anda eleyemediklerinde boş bırakma.' },
+];
+
+/* Önerilen süre planı (toplam 180 dk); kendi hızına göre ayarla */
+export const ZAMAN = [
+  ['1–6', 'Kelime', 8],
+  ['7–16', 'Dilbilgisi', 14],
+  ['17–26', 'Cloze Test', 15],
+  ['27–36', 'Cümle Tamamlama', 15],
+  ['37–42', 'Çeviri', 12],
+  ['43–62', 'Okuma Parçaları', 60],
+  ['63–67', 'Diyalog', 7],
+  ['68–71', 'Eş Anlamlı Cümle', 7],
+  ['72–75', 'Paragraf Tamamlama', 8],
+  ['76–80', 'Akışı Bozan Cümle', 8],
+  ['—', 'İşaretlenenlere dönüş ve kontrol', 26],
+];

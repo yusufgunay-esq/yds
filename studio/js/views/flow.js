@@ -12,7 +12,7 @@
    Görsel: v3 konularda HMGSV3 motoru; eski tipler okunur şema olarak.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import {
@@ -26,20 +26,12 @@ import { kitapPaneliHTML, ozetEtiketiHTML, kitapVar } from '../kitap.js';
 import { DERSLER } from '../notlar-data.js';
 import { openDers as notlarAc } from './notlar.js';
 
-let cur = { subjectId: 'medeni_hukuk', topicId: null };
+let cur = { subjectId: 'kelime', topicId: null };
 const ui = { menu: false, toc: false, q: '', sinav: false, sinavTum: true };
 let bagli = false;
 
-/* Stüdyo ders kimliği → Notlar ders kimliği */
-const NOT_ID = {
-  medeni_hukuk: 'medeni', borclar_hukuku: 'borclar', hmk: 'hmk', ticaret_hukuku: 'ticaret',
-  ceza_hukuku: 'ceza', anayasa_hukuku: 'anayasa', idare_hukuku: 'idare', icra_iflas: 'icra',
-  cmk: 'cmk', is_hukuku: 'is', vergi_hukuku: 'vergi', vergi_usul: 'vergi',
-  milletlerarasi_hukuk: 'milletlerarasi', mohuk: 'mohuk', avukatlik: 'avukatlik',
-  anayasa_yargisi: 'aymyargi', iyuk: 'iyuk', hukuk_felsefesi: 'felsefe',
-  hukuk_tarihi: 'tarih', genel_kamu: 'genelkamu'
-};
-const notOf = sid => DERSLER.find(d => d.id === NOT_ID[sid]);
+/* YDS: Stüdyo ders kimliği ile Notlar ders kimliği aynı. */
+const notOf = sid => DERSLER.find(d => d.id === sid);
 
 const okundu = id => !!(state().topics || {})[id];
 const okunanSay = sid => topicsOf(sid).filter(t => okundu(t.id)).length;
@@ -226,7 +218,7 @@ function seritHTML(sid) {
 }
 
 /* ---------- madde temizliği ----------
-   HMGS kanun maddesinin numarasını sormuyor; okurken göz de takılmasın.
+   YDS kanun maddesinin numarasını sormuyor; okurken göz de takılmasın.
    Sayılar (süre, yeter sayı, tutar) kalır, yalnız "m. 12" türü künye gider. */
 const MADDE_PAREN = /\s*\((?:[^()]*?(?:\bm\.|\bmd\.|\bmadde|sayılı|\bsk\b)\s*\d[^()]*|[A-ZÇĞİÖŞÜ]{2,6}\s*\d[\d\/]*)\)/g;
 const MADDE_ONEK = /(?:\d{3,4}\s*sayılı\s*[^,.;]{0,40}?\s*)?(?:(?<![A-Za-zÇĞİÖŞÜçğıöşü])[A-ZÇĞİÖŞÜ]{2,6}\s+)?(?<![A-Za-zçğıöşü])(?:[mM]\.|md\.|madde)\s*\d[\dIVX\/.,\-–&\s]*(?:ve\s*\d[\d\/]*\s*)?(?:uyarınca|gereğince|hükmüne göre|hükmü gereği|kapsamında|uyarinca|’(?:ye|ya|e|a)\s*göre|'(?:ye|ya|e|a)\s*göre)\s*,?\s*/g;

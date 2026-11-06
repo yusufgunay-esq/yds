@@ -6,7 +6,7 @@
    Her cevap telemetriye yazılır, SRS'e işlenir. Süre ölçümü pazarlıksızdır.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { esc, rich, richBlock, stripEmoji, splitStem, fmtSec, emptyState, groupLegalRefs, $, toast } from '../ui.js';
@@ -28,9 +28,9 @@ const rotaSeansi = tag => ROTA_TAGS.has(tag) || String(tag || '').startsWith('ko
 
 /**
  * Kesin Katman Sıralaması:
- * 1. Görülmemiş T1 (Gerçek HMGS Arşiv)
+ * 1. Görülmemiş T1 (Gerçek YDS Arşiv)
  * 2. Görülmemiş T2 (Deneme Setleri)
- * 3. Görülmemiş T3 (HMGS Benzeri AI - Opus > Sonnet > Gemini)
+ * 3. Görülmemiş T3 (YDS Benzeri AI - Opus > Sonnet > Gemini)
  * 4. Görülmüş T1 / T2 / T3
  * 5. Görülmemiş T4 (Hâkimlik/Savcılık İleri Düzey)
  * 6. Görülmüş T4
@@ -144,7 +144,7 @@ export function startSession(opts = {}) {
   } else if (mode === 'hmgsBenzeri' || mode === 'aiHmgs') {
     const raw = aiQuestions(subjectId);
     pool = shuffle(raw);
-    label = customLabel || (subjectId ? `HMGS Benzeri (AI) · ${subjectName(subjectId)}` : 'HMGS Benzeri Sorular (AI)');
+    label = customLabel || (subjectId ? `YDS Benzeri (AI) · ${subjectName(subjectId)}` : 'YDS Benzeri Sorular (AI)');
   } else {
     let raw = subjectId ? questionsOf(subjectId, targetScope) : allQuestions();
     if (targetScope === 'core') {
@@ -256,12 +256,12 @@ export function render() {
     <div class="card" style="margin-top:1rem">
       <h3 style="font-size:1rem;font-weight:700;margin-bottom:0.4rem">Soru Havuzu ve Hızlı Pratik</h3>
       <p style="font-size:0.9rem;color:var(--ink-2);margin-bottom:0.9rem">
-        Sınava kalan kritik günlerde doğrudan HMGS sınav ayarındaki sorularla çalışabilir veya ileri düzey sorularıyla derinleşebilirsin.
+        Sınava kalan kritik günlerde doğrudan YDS sınav ayarındaki sorularla çalışabilir veya ileri düzey sorularıyla derinleşebilirsin.
       </p>
       <div class="btn-row" style="display:flex;gap:0.5rem;flex-wrap:wrap">
-        <button class="btn" data-act="start-hmgs-benzeri" style="background:var(--accent);color:#fff">HMGS Benzeri Hızlı Pratik (20 Soru)</button>
-        <button class="btn btn-2" data-act="practice-hmgs-benzeri-all">HMGS Benzeri Tüm Havuz (${aiQuestions().length} Soru)</button>
-        <button class="btn btn-2" data-act="practice-core-karma">HMGS Çekirdek Karma (20 Soru)</button>
+        <button class="btn" data-act="start-hmgs-benzeri" style="background:var(--accent);color:#fff">YDS Benzeri Hızlı Pratik (20 Soru)</button>
+        <button class="btn btn-2" data-act="practice-hmgs-benzeri-all">YDS Benzeri Tüm Havuz (${aiQuestions().length} Soru)</button>
+        <button class="btn btn-2" data-act="practice-core-karma">YDS Çekirdek Karma (20 Soru)</button>
         <button class="btn btn-2" data-act="practice-all-karma">Tüm Havuz Karma (İleri Dahil)</button>
         <button class="btn btn-2" data-act="practice-pastexam">Arşiv Soruları Çöz</button>
       </div>
@@ -888,7 +888,7 @@ function renderSummary(host) {
 }
 
 /**
- * Seans sonu ekranındaki "HMGS Takip" paneli.
+ * Seans sonu ekranındaki "YDS Takip" paneli.
  * Gönderim OTOMATİKTİR — seans bitince (finalizeSession) arka planda kendiliğinden
  * denenir, kullanıcının bir şeye tıklaması gerekmez (18 Eylül 2026, kullanıcı
  * talimatı: "otomatik gitmeli zaten"). Panel sadece durumu gösterir (gönderildi /
@@ -899,6 +899,8 @@ function renderSummary(host) {
  * bir hata gibi göründüğü için nötr "card" stiline çevrildi (18 Eylül 2026).
  */
 function syncPanelHTML() {
+  return ''; /* YDS: Takip uygulaması kullanılmıyor; panel gösterilmez. */
+  // eslint-disable-next-line no-unreachable
   const st = S.pushState;
   const sent = st === 'ok';
   const busy = st === 'busy';
@@ -916,7 +918,7 @@ function syncPanelHTML() {
   return `
     <div class="card" style="margin-top:2rem" id="sync-panel">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.6rem;flex-wrap:wrap">
-        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)">HMGS Takip</div>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3)">YDS Takip</div>
         ${chip}
       </div>
       <p style="margin-bottom:0.75rem;color:var(--ink-2);font-size:0.9rem">${pending
@@ -1090,7 +1092,7 @@ export function repeatSession() {
   return startSession({ mode, count: count || S.questions.length, subjectId, tag: S.tag });
 }
 
-/* ---------- HMGS Takip App'e otomatik aktarım ---------- */
+/* ---------- YDS Takip App'e otomatik aktarım ---------- */
 
 /**
  * Seans bitince (renderSummary ilk kez çağrıldığında) ders/konu bazlı bir özet
@@ -1207,7 +1209,7 @@ function finalizeSession() {
 
   saveSession(result);
   save();
-  // Seans sonu ekranındaki "HMGS Takip" paneli notu bu id ile bulup yazar.
+  // Seans sonu ekranındaki "YDS Takip" paneli notu bu id ile bulup yazar.
   S.sessionId = result.id;
 
   // Kullanıcı hiçbir ek not girmese dahi seans asla kaybolmasın: cihaz-içi
@@ -1229,7 +1231,7 @@ function finalizeSession() {
   const sid = result.id;
   setTimeout(() => {
     if (S && S.sessionId === sid && S.pushState === 'pending') {
-      doSync(true).catch(() => {});
+      /* YDS: Takip yok, otomatik gönderim kapalı. */
     }
   }, 7000);
 }
@@ -1417,7 +1419,7 @@ export function buildGeminiPrompt(q, stateArg = {}) {
   };
 
   const L = [];
-  L.push('HMGS 2026/2 (27 Eylül 2026) hukuk sınavına çalışıyorum. Aşağıdaki soruda takıldım.');
+  L.push('YDS 2026/2 (22 Kasım 2026) İngilizce sınavına çalışıyorum. Aşağıdaki soruda takıldım.');
   L.push('');
   L.push(`Ders: ${subjectName(q.subjectId)}`);
   if (topic) L.push(`Konu: ${String(topic.title || '').replace(/^\s*\d+\.\s*/, '')}`);
@@ -1439,7 +1441,7 @@ export function buildGeminiPrompt(q, stateArg = {}) {
     L.push('Bu konuyu bilmiyor olabilirim; sıfırdan başla.');
     L.push('Henüz şık işaretlemedim. Doğru şıkkı söyleme, hiçbir şıkka "doğru" veya "yanlış" etiketi koyma, şıkları eleme.');
     L.push('Şunları bu sırayla yaz:');
-    L.push('1. KONU: bu soru hangi konudan; o konuyu gündelik dille 4-5 cümlede anlat. Hukuk terimini ilk geçtiği yerde parantezde günlük karşılığıyla ver.');
+    L.push('1. KONU: bu soru hangi konudan; o konuyu gündelik dille 4-5 cümlede anlat. İngilizce terimi ilk geçtiği yerde parantezde Türkçe karşılığıyla ver.');
     L.push('2. ŞEMA: konunun temel ayrımlarını bir Markdown tablosuyla ya da ok şemasıyla göster (ör. "şart → sonuç"). Tablo en fazla 5 satır.');
     L.push('3. ÖRNEK: kuralın işlediği kısa somut bir olay.');
     L.push('4. BU SORU: soruyu çözmek için hangi ayrıma/şarta bakmam gerekiyor. Doğru şıkkı söyleme, hiçbir şıkka doğru/yanlış deme, şıkları eleme.');
@@ -1459,8 +1461,8 @@ export function buildGeminiPrompt(q, stateArg = {}) {
       // kuralın icat edilmesini davet eder (bkz. ONARIM_RAPORU, uydurma içerik).
       L.push('Bu soruda EMİNDİM ve yanlış yaptım: demek ki kafamdaki kural yanlış. Konuyu sıfırdan anlatma, önce o yanlış kuralı bul.');
       L.push('Şunları bu sırayla yaz:');
-      L.push(`1. YANILGI: seçtiğim ${chosen} şıkkını doğru yapacak bir kural var mı? Varsa maddesiyle yaz, hangi şartlarda uygulandığını ve bu olayda neden uygulanmadığını göster. Böyle bir kural yoksa açıkça "böyle bir kural yok" de ve hangi kurumla karıştırmış olabileceğimi söyle. Kural uydurma.`);
-      L.push(`2. AYRIM: ${q.correct} ile ${chosen} arasındaki sınır hangi kanun maddesindeki hangi şarta dayanıyor. Tek cümle.`);
+      L.push(`1. YANILGI: seçtiğim ${chosen} şıkkını doğru yapacak bir kural var mı? Varsa kuralıyla yaz, hangi şartlarda uygulandığını ve bu olayda neden uygulanmadığını göster. Böyle bir kural yoksa açıkça "böyle bir kural yok" de ve hangi kurumla karıştırmış olabileceğimi söyle. Kural uydurma.`);
+      L.push(`2. AYRIM: ${q.correct} ile ${chosen} arasındaki sınır hangi dil bilgisi kuralına ya da anlam farkına dayanıyor. Tek cümle.`);
       L.push('3. ŞEMA: bu iki ihtimali yan yana koyan bir Markdown tablosu ya da ok şeması ("şart → sonuç"). En fazla 5 satır.');
       L.push(`4. SINAMA: aynı olayın tek bir unsurunu değiştir, doğru cevap ${chosen} olsun; yani benim kuralımın gerçekten işlediği vakayı göster. 1. maddede "böyle bir kural yok" dediysen, karıştırdığımı söylediğin kurumun işlediği bir olay kur.`);
       L.push('5. Uygulamanın açıklamasında eksik veya yanlış bir bilgi varsa söyle; yoksa "açıklama doğru" de.');
@@ -1472,7 +1474,7 @@ export function buildGeminiPrompt(q, stateArg = {}) {
       // Ama eleme rastgele de değil: DOĞRU şık elenmiş, sorulması gereken o.
       L.push('Kuralı bilmiyordum, şıkkı elemeyle seçtim; seçtiğim şık bir yanılgının değil, elemenin sonucu.');
       L.push('Bu konuyu hiç bilmediğimi varsay. Şunları bu sırayla yaz:');
-      L.push('1. KURAL: sorunun döndüğü kuralı gündelik dille anlat. Hukuk terimini ilk kullandığında parantez içinde günlük karşılığını ver.');
+      L.push('1. KURAL: sorunun döndüğü kuralı gündelik dille anlat. İngilizce terimi ilk kullandığında parantez içinde Türkçe karşılığını ver.');
       L.push('2. ŞEMA: konunun temel ayrımlarını bir Markdown tablosuyla ya da ok şemasıyla göster (ör. "şart → sonuç"). Tablo en fazla 5 satır.');
       L.push('3. ÖRNEK: kuralın işlediği somut bir olay kur; sonra olayın tek bir unsurunu değiştirip sonucun nasıl tersine döndüğünü göster.');
       L.push(`4. ELEME: doğru şık ${q.correct} bana neden yanlış göründü; hangi görünür özelliği (dili, istisna gibi durması, fazla genel olması) beni ondan uzaklaştırmış olabilir.`);
@@ -1488,17 +1490,17 @@ export function buildGeminiPrompt(q, stateArg = {}) {
       L.push('Aynı anlatımı tekrarlama: kuralı en fazla 2 cümleyle hatırlat, sonra şunları yaz:');
       L.push(`1. UYGULAMA HATASI: anlattığın kuralın hangi parçasını bu olaya yanlış uygulamış olabilirim ki ${chosen} dedim.`);
       L.push('2. ŞEMA: yalnız bu ayrımı gösteren bir Markdown tablosu ya da ok şeması. En fazla 4 satır.');
-      L.push(`3. AYRIM: ${q.correct} ile ${chosen} arasındaki sınır hangi kanun maddesindeki hangi şarta dayanıyor.`);
+      L.push(`3. AYRIM: ${q.correct} ile ${chosen} arasındaki sınır hangi dil bilgisi kuralına ya da anlam farkına dayanıyor.`);
       L.push('4. Uygulamanın açıklamasında eksik veya yanlış bir bilgi varsa söyle; yoksa "açıklama doğru" de.');
       L.push('5. HATIRLATMA KARTI: bu kuralı sınav sabahı okuyacağım 2 satıra indir.');
       L.push('Kısa ve sade yaz. Akademik paragraf ve genel sınav tavsiyesi istemiyorum.');
     } else {
       L.push('Bu konuyu hiç bilmediğimi varsay. Şunları bu sırayla yaz:');
-      L.push('1. KURAL: sorunun döndüğü kuralı, konuyu hiç bilmediğimi varsayarak gündelik dille anlat. Hukuk terimini ilk kullandığında parantez içinde günlük karşılığını ver.');
+      L.push('1. KURAL: sorunun döndüğü kuralı, konuyu hiç bilmediğimi varsayarak gündelik dille anlat. İngilizce terimi ilk kullandığında parantez içinde Türkçe karşılığını ver.');
       L.push('2. ŞEMA: konunun temel ayrımlarını bir Markdown tablosuyla ya da ok şemasıyla göster (ör. "şart → sonuç"). Tablo en fazla 5 satır.');
       L.push('3. ÖRNEK: kuralın işlediği somut bir olay kur; sonra olayın tek bir unsurunu değiştirip sonucun nasıl tersine döndüğünü göster.');
       L.push(`4. HATAM: seçtiğim ${chosen} şıkkı neden yanlış; hangi kavramı ya da şartı karıştırmışım.`);
-      L.push(`5. AYRIM: ${q.correct} ile ${chosen} arasındaki sınır hangi kanun maddesindeki hangi şarta dayanıyor.`);
+      L.push(`5. AYRIM: ${q.correct} ile ${chosen} arasındaki sınır hangi dil bilgisi kuralına ya da anlam farkına dayanıyor.`);
       L.push('6. Uygulamanın açıklamasında eksik veya yanlış bir bilgi varsa söyle; yoksa "açıklama doğru" de.');
       L.push('7. HATIRLATMA KARTI: bu kuralı sınav sabahı okuyacağım 2 satıra indir.');
       L.push('Sade cümle kur, maddeler halinde yaz. 1 ve 3 birlikte 150 kelimeyi geçmesin. Akademik paragraf ve genel sınav tavsiyesi istemiyorum.');
@@ -1510,10 +1512,10 @@ export function buildGeminiPrompt(q, stateArg = {}) {
     L.push(`Uygulamanın kendi açıklaması: ${String(q.explanation || '').trim()}`);
     L.push('Açıklamanın tamamını tekrar yazma; üstüne ekle.');
     L.push('Bu konuyu bilmiyorum; sıfırdan anlat. Şunları bu sırayla yaz:');
-    L.push('1. KURAL: sorunun döndüğü kuralı gündelik dille anlat. Hukuk terimini ilk kullandığında parantez içinde günlük karşılığını ver.');
+    L.push('1. KURAL: sorunun döndüğü kuralı gündelik dille anlat. İngilizce terimi ilk kullandığında parantez içinde Türkçe karşılığını ver.');
     L.push('2. ŞEMA: konunun temel ayrımlarını bir Markdown tablosuyla ya da ok şemasıyla göster (ör. "şart → sonuç"). Tablo en fazla 5 satır.');
     L.push('3. ÖRNEK: kuralın işlediği somut bir olay kur; sonra olayın tek bir unsurunu değiştirip sonucun nasıl tersine döndüğünü göster.');
-    L.push('4. Doğru şıkkı doğru yapan şart ne; kanun maddesiyle.');
+    L.push('4. Doğru şıkkı doğru yapan şart ne; kuralıyla.');
     L.push('5. Diğer dört şık neden yanlış; her biri tek satır, hangi kavramla karıştırılmak isteniyor.');
     L.push('6. HATIRLATMA KARTI: bu kuralı sınav sabahı okuyacağım 2 satıra indir.');
     L.push('Sade cümle kur, maddeler halinde yaz. 1 ve 3 birlikte 150 kelimeyi geçmesin. Akademik paragraf ve genel sınav tavsiyesi istemiyorum.');
@@ -1528,10 +1530,10 @@ export function buildGeminiPrompt(q, stateArg = {}) {
       L.push(`Uygulamanın kendi açıklaması: ${String(q.explanation || '').trim()}`);
       L.push('Açıklamanın tamamını tekrar yazma; üstüne ekle.');
       L.push('Şunları bu sırayla yaz:');
-      L.push('1. KURAL: sorunun döndüğü kuralı gündelik dille anlat. Hukuk terimini ilk kullandığında parantez içinde günlük karşılığını ver.');
+      L.push('1. KURAL: sorunun döndüğü kuralı gündelik dille anlat. İngilizce terimi ilk kullandığında parantez içinde Türkçe karşılığını ver.');
       L.push('2. ŞEMA: konunun temel ayrımlarını bir Markdown tablosuyla ya da ok şemasıyla göster (ör. "şart → sonuç"). Tablo en fazla 5 satır.');
       L.push('3. ÖRNEK: kuralın işlediği somut bir olay kur; sonra olayın tek bir unsurunu değiştirip sonucun nasıl tersine döndüğünü göster.');
-      L.push('4. Doğru şıkkı doğru yapan şart ne; kanun maddesiyle.');
+      L.push('4. Doğru şıkkı doğru yapan şart ne; kuralıyla.');
       L.push('5. Diğer dört şık neden yanlış; her biri tek satır, hangi kavramla karıştırılmak isteniyor.');
       L.push('6. HATIRLATMA KARTI: bu kuralı sınav sabahı okuyacağım 2 satıra indir.');
       L.push('Sade cümle kur, maddeler halinde yaz. 1 ve 3 birlikte 150 kelimeyi geçmesin. Akademik paragraf ve genel sınav tavsiyesi istemiyorum.');
@@ -1541,7 +1543,7 @@ export function buildGeminiPrompt(q, stateArg = {}) {
       L.push(`Bu konuyu az önce bana sen anlattın (ipucu istemiştim), sonra doğru işaretledim (${q.correct}).`);
       L.push(`Uygulamanın kendi açıklaması: ${String(q.explanation || '').trim()}`);
       L.push('Anlattığını ve açıklamayı tekrarlama. Yalnız şunları yaz:');
-      L.push('1. Bu şıkkı doğru yapan şart tek cümlede, hangi maddeden geliyor.');
+      L.push('1. Bu şıkkı doğru yapan şart tek cümlede, hangi kuraldan geliyor.');
       L.push('2. Bu soruyu yardımsız çözebilmem için bilmem gereken tek ayrım ne.');
       L.push('3. ŞEMA: o ayrımı gösteren bir Markdown tablosu ya da ok şeması. En fazla 3 satır.');
       L.push('4. HATIRLATMA KARTI: bu ayrımı sınav sabahı okuyacağım 2 satıra indir.');
@@ -1551,7 +1553,7 @@ export function buildGeminiPrompt(q, stateArg = {}) {
       L.push(`Uygulamanın kendi açıklaması: ${String(q.explanation || '').trim()}`);
       L.push('Açıklamanın tamamını tekrar yazma; üstüne ekle.');
       L.push('Şunları yaz:');
-      L.push('1. Bu şıkkı doğru yapan şart ne, hangi maddeden geliyor.');
+      L.push('1. Bu şıkkı doğru yapan şart ne, hangi kuraldan geliyor.');
       if (conf === 'sure') {
         // Emin + doğru: tek gerçek risk, doğru cevaba yanlış gerekçeyle varmış
         // olmak. Bahis yokken sorulamayan soru bu; kısaltma değil, ekleme.
@@ -1567,7 +1569,7 @@ export function buildGeminiPrompt(q, stateArg = {}) {
   }
 
   L.push('');
-  L.push('Türkçe yaz. Madde numarasından emin değilsen numara uydurma; "madde numarası teyit edilmeli" yaz.');
+  L.push('Türkçe yaz. Emin olmadığın bir kuralı uydurma; "teyit edilmeli" yaz.');
 
   return { mode, text: L.join('\n') };
 }

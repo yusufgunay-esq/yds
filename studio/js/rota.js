@@ -24,7 +24,7 @@
         kural farklı kılıklarda yeniden kurulur, sonra asıl soru o kuralın
         oturup oturmadığını sınar (aynı soruyu tekrar etmek cevabın harfini
         ezberletir, kuralı değil). Aynı anda en çok 3 konu açık; biri bitince
-        sıradaki gelir. Hâkimlik ve HMGS benzeri yanlışları akışın içinde döner.
+        sıradaki gelir. Hâkimlik ve YDS benzeri yanlışları akışın içinde döner.
      5. Süreler ve sayılar (son 4 gün).
      6. Akış: sonsuz.
 
@@ -36,7 +36,7 @@
    toplam aynı kalır. Ayrı bir plan kaydı tutmaya gerek yok.
    ========================================================================== */
 /* © 2026 Yusuf GÜNAY — Tüm Hakları Saklıdır / All Rights Reserved.
-   Bu dosya HMGS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
+   Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { questionById, pastExamList, pastExamQuestions, aiQuestions, tierOf, topicById, questionsOfTopic, questionsOf, SUBJECT_BY_ID, subjectName, shuffle, TIER_REAL, TIER_DENEME, TIER_AI, TIER_ADV, aiModelRank } from './data.js';
@@ -169,7 +169,7 @@ export function denemeTekrari(today = todayKey()) {
 
 /** Hâlâ mezun olmamış inatçı sorular (3+ kez takılan). */
 export function inatcilar() {
-  // HMGS soruları önce; ileri havuzndaki inatçılar listenin sonunda.
+  // YDS soruları önce; ileri havuzndaki inatçılar listenin sonunda.
   const l = leechQuestions().filter(d => (d.srs.box || 0) < BOXES.length).map(d => d.q);
   return l.filter(q => tierOf(q) !== TIER_ADV).concat(l.filter(q => tierOf(q) === TIER_ADV));
 }
@@ -224,7 +224,7 @@ export function konuOdevleri(today = todayKey(), adet = 3, soru = 8) {
 
 export const ONARIM = { KARDES: 4, YANLIS_MAX: 3, ACIK_KONU: 3 };
 
-/** Onarım listesine girecek yanlış: yalnız gerçek HMGS ve YETKİ denemesi. */
+/** Onarım listesine girecek yanlış: yalnız gerçek YDS ve YETKİ denemesi. */
 export const onarimYanlisi = q => { const t = tierOf(q); return t === TIER_REAL || t === TIER_DENEME; };
 
 /** Sorunun onarım grubu: konusu varsa konu, yoksa (YETKİ sorularının çoğu) ders. */
@@ -252,8 +252,8 @@ function kardesHavuzu(k, haric) {
   const t3 = aday.filter(q => tierOf(q) === TIER_AI).sort((a, b) => aiModelRank(a) - aiModelRank(b));
   const t4 = shuffle(aday.filter(q => tierOf(q) === TIER_ADV));
 
-  // Eğer bu konuda görülmemiş Gerçek HMGS veya Deneme Seti kalmadıysa,
-  // doğrudan AI sorusuna atlamak yerine aynı dersin henüz görülmemiş Gerçek HMGS ve Deneme Seti sorularına bak:
+  // Eğer bu konuda görülmemiş Gerçek YDS veya Deneme Seti kalmadıysa,
+  // doğrudan AI sorusuna atlamak yerine aynı dersin henüz görülmemiş Gerçek YDS ve Deneme Seti sorularına bak:
   if (!t1.length && !t2.length && k.startsWith('t:')) {
     const topic = topicById.get(k.slice(2));
     if (topic && topic.subjectId) {
@@ -389,7 +389,7 @@ export function kagitSorulari(src) {
 }
 
 const AYLAR = ['ocak', 'şubat', 'mart', 'nisan', 'mayıs', 'haziran', 'temmuz', 'ağustos', 'eylül', 'ekim', 'kasım', 'aralık'];
-/** Kâğıdın tarihi (yıl×12 + ay); bilinmiyorsa 0. Etiketten okunur: "HMGS Nisan 2026". */
+/** Kâğıdın tarihi (yıl×12 + ay); bilinmiyorsa 0. Etiketten okunur: "YDS Nisan 2026". */
 function yeniligi(o) {
   const t = String(o.label || '').toLocaleLowerCase('tr-TR');
   const y = t.match(/20\d\d/);
@@ -555,7 +555,7 @@ export function rota(opts = {}) {
   const hapOkunan = HAP.filter(h => (S.hap || {})[h.id]).length;
   const hap = D <= 4 ? {
     id: 'hap', tur: 'hap', baslik: 'Önce oku: sınav kartları',
-    neden: 'Dört sınavın en çok sorduğu konular, sınav sırasıyla. Her kartta sınanan kural ve kurulan tuzak var; okudukça işaretle, sonra soruya geç.',
+    neden: 'En çok sorulan konular, sınav sırasıyla. Her kartta sınanan kural ve kurulan tuzak var; okudukça işaretle, sonra soruya geç.',
     plan: HAP.length, yapilan: Math.min(hapOkunan, HAP.length),
     birim: 'kart', cta: hapOkunan ? 'Okumaya devam et' : 'Okumaya başla', launch: { tur: 'hap' }
   } : null;

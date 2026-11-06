@@ -5,7 +5,7 @@
    ========================================================================== */
 
 import { questionsBySubject, QUESTIONS } from '../data.js';
-import { startPracticeSession } from './practice.js';
+import { startSession } from './practice.js';
 
 export const DRILLS = [
   {
@@ -130,8 +130,19 @@ export function registerPratikEvents() {
     }
 
     // Switch to practice view
-    if (typeof startPracticeSession === 'function') {
-      startPracticeSession({ subjectId: subj, count: 5 });
+    if (startSession({ subjectId: subj, count: 5 })) {
+      const nav = document.querySelector('.nav [data-view="practice"]');
+      if (nav) nav.click();
     }
   });
 }
+
+/* YDS: HMGS hukuk vaka üreteçleri kaldırıldı; odevler.js sözleşmesi için boş liste. */
+export const GENERATORS = [];
+
+/* main.js sözleşmesi: görünüm render + olay bağlama. HMGS vaka üreteci eylemleri YDS'de yok (no-op). */
+export function render() { renderPratik(); registerPratikEvents(); }
+export function ac() {}
+export function geri() {}
+export function yeni() {}
+export function sonsuzBasla() {}
