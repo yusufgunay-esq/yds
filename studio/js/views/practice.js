@@ -259,8 +259,8 @@ export function render() {
         Sınava kalan kritik günlerde doğrudan YDS sınav ayarındaki sorularla çalışabilir veya ileri düzey sorularıyla derinleşebilirsin.
       </p>
       <div class="btn-row" style="display:flex;gap:0.5rem;flex-wrap:wrap">
-        <button class="btn" data-act="start-hmgs-benzeri" style="background:var(--accent);color:#fff">YDS Benzeri Hızlı Pratik (20 Soru)</button>
-        <button class="btn btn-2" data-act="practice-hmgs-benzeri-all">YDS Benzeri Tüm Havuz (${aiQuestions().length} Soru)</button>
+        ${aiQuestions().length ? `<button class="btn" data-act="start-hmgs-benzeri" style="background:var(--accent);color:#fff">YDS Benzeri Hızlı Pratik (20 Soru)</button>
+        <button class="btn btn-2" data-act="practice-hmgs-benzeri-all">YDS Benzeri Tüm Havuz (${aiQuestions().length} Soru)</button>` : ''}
         <button class="btn btn-2" data-act="practice-core-karma">YDS Çekirdek Karma (20 Soru)</button>
         <button class="btn btn-2" data-act="practice-all-karma">Tüm Havuz Karma (İleri Dahil)</button>
         <button class="btn btn-2" data-act="practice-pastexam">Arşiv Soruları Çöz</button>
