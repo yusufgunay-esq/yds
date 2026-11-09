@@ -1,4 +1,4 @@
-/* YDS Stüdyo: AI üretimi sorular (derle.py ile üretildi; elle düzenleme, arşivdeki JSON'u düzenle) */
+/* YDS Stüdyo: AI üretimi sorular (derle.py ile üretildi; elle düzenleme, arşivdeki JSON dosyasında yapilir) */
 
 const QUESTIONS_AI_DATA = [
   {
@@ -609,3 +609,4 @@ const QUESTIONS_AI_DATA = [
     "qType": "es_anlam"
   }
 ];
+if (typeof window !== 'undefined') window.QUESTIONS_AI_DATA = QUESTIONS_AI_DATA;
