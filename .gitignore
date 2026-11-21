@@ -1,0 +1,57 @@
+# ==============================================================================
+# YDS (.gitignore)
+# ==============================================================================
+
+# --- 1. Kimlik ve Ortam Dosyaları ---
+client_secret.json
+.tokens.json
+sync.log
+.pushed_studio_sessions.json
+.env
+*.env
+*.pem
+*.key
+github_token.txt
+
+# --- 2. Yerel Çalışma ve Oturum Verileri ---
+studio_sessions_export.json
+*.session.json
+uploads/
+task_history.json
+yds_vault.json
+yds_data.json
+questions.js
+topics.js
+data/
+scratch/
+
+# --- 3. Geçici ve Yedek Dosyalar ---
+*.bak*
+*.tmp
+archive/
+
+# --- 4. Sistem ve Derleme Dosyaları ---
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+log/
+*.log
+.DS_Store
+Thumbs.db
+
+# --- 5. Yerel Geliştirme ve Test Klasörleri ---
+/studio/test/
+build_vault.py
+studio_server.py
+baslat.bat
+araclar_*.py
+_claude/
+_rea_*/
+REA.md
+REA-*.md
+rea-kutuphanesi.json
+_ekran/
+_demo/
+work/
+.claude/
