@@ -28,12 +28,12 @@
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { esc, rich, richBlock, splitStem, fmtSec, stripEmoji, $, toast } from '../ui.js';
-import { subjectName, topicById, tierOf } from '../data.js';
+import { subjectName, topicById, tierOf, passageKey } from '../data.js';
 import { recordAnswer, markLastAnswerAttention, save, saveSession, state, TARGET_SEC } from '../store.js';
 import * as seans from '../seans.js';
 import {
   scheduleAfterAnswer, flowFeed, flowFeedDers, dersDurumu, flowReinforce, flowMilestone, ydsCoverage,
-  ydsMap, ydsMapRow, tileState, answersSincePrev, calibration, CONF,
+  ydsMap, ydsMapRow, tileState, answersSincePrev, calibration, CONF, expandPassagesForFlow,
   FLOW_REFILL_AT, FLOW_REINFORCE_DELAY, FLOW_BATCH
 } from '../engine.js';
 import { premiseHTML, optionRowHTML, toggleOption, togglePremise } from '../elim.js';
@@ -181,7 +181,7 @@ export function render() {
       <div class="q-shell" id="q-shell">
         <div class="q-main">
           <div class="card q-card akim-card">
-            ${premiseHTML(premise, null, { active: q.qNumber })}
+            ${premiseHTML(premise, null, { active: q.qNumber, progress: akimPassageProgress(q) })}
             <div class="q-ask">${rich(ask)}</div>
             <div class="opts" id="opts">
               ${q.options.map(o => optionRowHTML(o, { pickAct: 'akim-pick' })).join('')}
@@ -233,6 +233,25 @@ export function render() {
 /** Tur: 10 soruluk yakın hedef. Noktalar yalnız dolar, renkleri doğruluğu
     yargılamaz (yanlış da tur doldurur: işin kendisi sayılır, isabet değil). */
 export const ROUND = 10;
+
+/** Aynı okuma/cloze parçasının ardışık soruları içinde kaçıncı sorudayız. */
+function akimPassageProgress(q) {
+  const pk = passageKey(q);
+  if (!pk || !A) return null;
+  const prevLog = A.answered ? A.log.slice(0, -1) : A.log;
+  let before = 0;
+  for (let i = prevLog.length - 1; i >= 0; i--) {
+    if (passageKey(prevLog[i].q) === pk) before++;
+    else break;
+  }
+  let ahead = 0;
+  for (let i = 0; i < A.queue.length; i++) {
+    if (passageKey(A.queue[i]) === pk) ahead++;
+    else break;
+  }
+  const total = before + ahead;
+  return total > 1 ? { idx: before + 1, total } : null;
+}
 
 function roundState() {
   const n = A ? A.log.length : 0;
@@ -457,7 +476,7 @@ function closingHTML(run) {
 
     ${dersSeciciHTML(true)}
     <button class="btn-link" data-act="go-today">Bugün ekranına dön</button>
-    <p class="hint" style="margin:0.75rem 0 1.25rem">Bu akışın çözümleri çalışma kaydına (Takip) yazıldı. ${coverageLine()}</p>
+    <p class="hint" style="margin:0.75rem 0 1.25rem">Bu akışın çözümleri çalışma kaydına yazıldı. ${coverageLine()}</p>
     ${fullMapHTML(run.litIds)}
   </div>`;
 }
@@ -694,7 +713,7 @@ function paintResult(q, chosen, row, sched, ms) {
           <div class="fb-meta-strip">
             <div class="fb-meta-item"><span class="fb-meta-label">Kaynak</span><span class="fb-meta-val">${esc(sourceText(q))}</span></div>
             <div class="fb-meta-item"><span class="fb-meta-label">Ders</span><span class="fb-meta-val">${esc(subjectName(q.subjectId))}</span></div>
-            ${q.legalBasis ? `<div class="fb-meta-item"><span class="fb-meta-label">Mevzuat</span><span class="fb-meta-val">${esc(q.legalBasis)}</span></div>` : ''}
+            ${q.legalBasis ? `<div class="fb-meta-item"><span class="fb-meta-label">Kural</span><span class="fb-meta-val">${esc(q.legalBasis)}</span></div>` : ''}
           </div>
           <div class="kural-slot" id="kural-slot" hidden></div>
         </div>
@@ -798,11 +817,29 @@ export function next() {
   const lastLog = A.log[A.log.length - 1];
 
   // Yanlıştan sonra aynı kuraldan kardeş soru kısa gecikmeyle geri gelir.
-  if (done && lastLog && !lastLog.ok) {
+  // Parçalı soruda devam eden okuma/cloze bloğu zaten sürüyorsa araya ek parça
+  // yığmaz; parçanın sonunda ya da parçasız soruda kardeş soruyu parça bölmeden ekler.
+  const donePk = done ? passageKey(done) : null;
+  const samePassageContinues = !!(donePk && A.queue[0] && passageKey(A.queue[0]) === donePk);
+  if (done && lastLog && !lastLog.ok && !samePassageContinues) {
     const r = flowReinforce(done, A.usedIds, A.scope, { dersFiltresi: A.dersler.length > 0 });
     if (r) {
-      A.queue.splice(Math.min(FLOW_REINFORCE_DELAY, A.queue.length), 0, r);
-      A.usedIds.add(r.id);
+      let insertAt = Math.min(FLOW_REINFORCE_DELAY, A.queue.length);
+      const curPk = A.queue[0] ? passageKey(A.queue[0]) : null;
+      if (curPk) {
+        let end = 0;
+        while (end < A.queue.length && passageKey(A.queue[end]) === curPk) end++;
+        if (insertAt < end) insertAt = end;
+      }
+      while (insertAt > 0 && insertAt < A.queue.length) {
+        const prevPk = passageKey(A.queue[insertAt - 1]);
+        if (prevPk && prevPk === passageKey(A.queue[insertAt])) insertAt++;
+        else break;
+      }
+      const pack = expandPassagesForFlow([r], { count: 5, excludeIds: A.usedIds });
+      const toAdd = pack.length ? pack : [r];
+      A.queue.splice(insertAt, 0, ...toAdd);
+      toAdd.forEach(x => A.usedIds.add(x.id));
     }
   }
 
@@ -821,7 +858,7 @@ function refill() {
   if (A.queue.length >= FLOW_REFILL_AT) return;
   const f = A.dersler.length
     ? flowFeedDers(FLOW_BATCH, A.dersler, A.scope, A.usedIds)
-    : flowFeed(FLOW_BATCH, A.scope, { blockedSubjects: A.blockedSubjects });
+    : flowFeed(FLOW_BATCH, A.scope, { blockedSubjects: A.blockedSubjects, excludeIds: A.usedIds });
   (f.blockedThisCall || []).forEach(id => A.blockedSubjects.add(id));
   for (const q of f.questions) {
     if (!A.usedIds.has(q.id)) { A.queue.push(q); A.usedIds.add(q.id); }

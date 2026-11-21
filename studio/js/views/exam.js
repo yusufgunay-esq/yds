@@ -11,7 +11,7 @@
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { esc, rich, richBlock, stripEmoji, splitStem, fmtClock, emptyState, $, toast } from '../ui.js';
-import { buildAlgorithmicExamSet, getAlgorithmicExamPreview, subjectName, SUBJECTS, topicById, questionById, questionsBySubject, pastExamList, pastExamQuestions, denemeSetList, denemeSetQuestions } from '../data.js';
+import { buildAlgorithmicExamSet, getAlgorithmicExamPreview, subjectName, SUBJECTS, topicById, questionById, questionsBySubject, pastExamList, pastExamQuestions, denemeSetList, denemeSetQuestions, passageProgress } from '../data.js';
 import { recordAnswer, markExamAnswerAttention, save, saveExam, state, lastExam, EXAM_TOTAL, PASS_CORRECT } from '../store.js';
 import { scheduleAfterAnswer, scoreOf } from '../engine.js';
 import { premiseHTML, optionRowHTML, toggleOption, togglePremise, extractNumerals, isAutoStruck } from '../elim.js';
@@ -348,7 +348,7 @@ export function render() {
         </div>
 
         <div class="card">
-          ${premiseHTML(premise, struckPremises, { active: q.qNumber })}
+          ${premiseHTML(premise, struckPremises, { active: q.qNumber, progress: passageProgress(E.questions, E.i) })}
           <div class="q-ask">${rich(ask)}</div>
           <div class="opts" id="exam-opts">
             ${q.options.map(o => {

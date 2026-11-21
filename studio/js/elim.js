@@ -20,14 +20,16 @@ import { esc, rich, PASSAGE_PREFIX } from './ui.js';
 
 /** YDS parçası: okuma ya da boşluk doldurma metni tek kartta. Cloze'da
  *  sorunun kendi boşluğu (active = soru no) vurgulanır. */
-function passageHTML(body, active) {
+function passageHTML(body, active, progress) {
   const cloze = /\(\d{1,2}\)\s*-{3,}/.test(body);
   let html = body.split(/\n+/).map(p => p.trim()).filter(Boolean).map(p => `<p>${rich(p)}</p>`).join('');
   if (cloze && active) {
     html = html.replace(`<span class="yds-blank" data-n="${active}">`, `<span class="yds-blank on" data-n="${active}">`);
   }
+  const head = cloze ? 'Parça · boşluk doldurma' : 'Okuma parçası';
+  const step = progress && progress.total > 1 ? ` · ${progress.idx} / ${progress.total}` : '';
   return `<div class="q-passage${cloze ? ' is-cloze' : ''}">
-    <div class="q-passage-k">${cloze ? 'Parça · boşluk doldurma' : 'Okuma parçası'}</div>
+    <div class="q-passage-k">${head}${step}</div>
     <div class="q-passage-body">${html}</div>
   </div>`;
 }
@@ -43,7 +45,7 @@ const IS_ITEM = /^(I{1,3}|IV|V|VI{0,3}|VII|VIII|IX|X)\.\s+/;
  */
 export function premiseHTML(premise, struckNumerals, opts = {}) {
   if (!premise) return '';
-  if (premise.startsWith(PASSAGE_PREFIX)) return passageHTML(premise.slice(PASSAGE_PREFIX.length), opts.active);
+  if (premise.startsWith(PASSAGE_PREFIX)) return passageHTML(premise.slice(PASSAGE_PREFIX.length), opts.active, opts.progress);
   const struckSet = struckNumerals instanceof Set ? struckNumerals : new Set(struckNumerals || []);
   const raw = String(premise).split('\n').map(l => l.trim()).filter(Boolean);
 

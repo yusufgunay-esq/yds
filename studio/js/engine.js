@@ -14,7 +14,7 @@
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { state, TARGET_SEC, PASS_CORRECT, daysLeft, answersToday, lastExam, todayKey, EXAM_DATE } from './store.js';
-import { SUBJECTS, questionsOf, questionById, topicsOf, topicById, questionsOfTopic, shuffle, tierOf, TIER_REAL, TIER_DENEME, TIER_AI, TIER_ADV, aiModelRank, isCoreTarget } from './data.js';
+import { SUBJECTS, questionsOf, questionById, topicsOf, topicById, questionsOfTopic, shuffle, tierOf, TIER_REAL, TIER_DENEME, TIER_AI, TIER_ADV, aiModelRank, isCoreTarget, passageKey, passageSiblings } from './data.js';
 
 /* ==========================================================================
    1. SRS — ARALIKLI GERİ GETİRME
@@ -1478,12 +1478,77 @@ export const FLOW_REINFORCE_WINDOW = 20;
 export const FLOW_REINFORCE_MAX = 5;
 
 /**
+ * Akış kuyruğunda YDS parça bütünlüğü (okuma parçası ve cloze test).
+ * Karma motoru soruları tek tek seçer; parçalı bir soruya gelindiğinde aynı
+ * parçanın görülmemiş ya da vadesi gelmiş kardeşlerini kitapçık sırasıyla
+ * peş peşe toplar. Bir dersin karma partideki bütçesi dolduğunda aynı dersten
+ * ikinci bir parça açmaz; böylece hem parça bütünlüğü hem ders çeşitliliği
+ * birlikte korunur. Parçasız havuzlarda (ör. test verisi) listeye dokunmaz.
+ */
+export function expandPassagesForFlow(questions, opts = {}) {
+  if (!Array.isArray(questions) || !questions.length) return [];
+  if (!questions.some(passageKey)) return questions.slice();
+
+  const S = state();
+  const seenIds = new Set(S.answers.map(a => a.qId));
+  const now = new Date();
+  const exclude = opts.excludeIds instanceof Set ? opts.excludeIds : new Set();
+  const target = opts.count || questions.length;
+  const out = [];
+  const used = new Set(exclude);
+  const donePassages = new Set();
+
+  // Her ders için karma motorunun bu partiye ayırdığı soru bütçesi.
+  const subjectBudget = new Map();
+  for (const q of questions) {
+    if (!q) continue;
+    subjectBudget.set(q.subjectId, (subjectBudget.get(q.subjectId) || 0) + 1);
+  }
+  const subjectAdded = new Map();
+
+  for (const q of questions) {
+    if (out.length >= target) break;
+    if (!q || used.has(q.id)) continue;
+    const pk = passageKey(q);
+    if (!pk) {
+      out.push(q);
+      used.add(q.id);
+      subjectAdded.set(q.subjectId, (subjectAdded.get(q.subjectId) || 0) + 1);
+      continue;
+    }
+    if (donePassages.has(pk)) continue;
+    const added = subjectAdded.get(q.subjectId) || 0;
+    const budget = subjectBudget.get(q.subjectId) || 1;
+    const sibs = passageSiblings(q).filter(x => {
+      if (used.has(x.id)) return false;
+      if (x.id === q.id) return true;
+      if (!seenIds.has(x.id)) return true;
+      const r = S.srs[x.id];
+      return !!(r && isDue(r, now));
+    });
+    if (!sibs.length) continue;
+    // Karma partide (birden çok ders) bir dersten zaten bir parça alındıysa
+    // ve yeni parça ders bütçesini taşırıyorsa diğer derslere sıra ver.
+    if (subjectBudget.size > 1 && added > 0 && added + sibs.length > budget) continue;
+
+    donePassages.add(pk);
+    for (const x of sibs) {
+      out.push(x);
+      used.add(x.id);
+    }
+    subjectAdded.set(q.subjectId, added + sibs.length);
+  }
+  return out;
+}
+
+/**
  * Akış kuyruğu için bir parti soru üret. buildKarmaSet'in ince sarmalayıcısı:
  * vadesi gelen SRS tekrarları önce, kalanı ölçülmüş sınav ağırlığına göre,
- * aynı ders yan yana gelmeden. Tek doğruluk kaynağı karma motorudur.
+ * aynı ders yan yana gelmeden; parçalı YDS soruları bütün olarak peş peşe gelir.
  */
 export function flowFeed(count = FLOW_BATCH, scope = 'core', opts = {}) {
-  return buildKarmaSet(count, scope, opts);
+  const res = buildKarmaSet(count, scope, opts);
+  return { ...res, questions: expandPassagesForFlow(res.questions, { count, excludeIds: opts.excludeIds }) };
 }
 
 /**
@@ -1582,7 +1647,7 @@ export function flowFeedDers(count = FLOW_BATCH, subjectIds = [], scope = 'core'
     for (const q of n) { out.push(q); if (++i % adim === 0 && d.length) out.push(d.shift()); }
     out.push(...d);
   }
-  return { questions: out.slice(0, count), due: due.length };
+  return { questions: expandPassagesForFlow(out, { count, excludeIds }), due: due.length };
 }
 
 /**

@@ -10,7 +10,7 @@
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { esc, rich, richBlock, stripEmoji, splitStem, fmtSec, emptyState, groupLegalRefs, $, toast } from '../ui.js';
-import { subjectName, questionsOf, questionsOfTopic, questionsOfTopics, shuffle, topicById, pastExamQuestions, aiQuestions, isCoreTarget, QUESTIONS, tierOf, TIER_REAL, TIER_DENEME, TIER_AI, TIER_ADV, aiModelRank, takeWithPassages } from '../data.js';
+import { subjectName, questionsOf, questionsOfTopic, questionsOfTopics, shuffle, topicById, pastExamQuestions, aiQuestions, isCoreTarget, QUESTIONS, tierOf, TIER_REAL, TIER_DENEME, TIER_AI, TIER_ADV, aiModelRank, takeWithPassages, passageProgress } from '../data.js';
 import { recordAnswer, markLastAnswerLogic, markLastAnswerAttention, save, saveSession, state, TARGET_SEC } from '../store.js';
 import * as seans from '../seans.js';
 import { scheduleAfterAnswer, reScheduleAsLogic, dueQuestions, unseenQuestions, buildKarmaSet, buildDeadlinesSet, CONF } from '../engine.js';
@@ -324,7 +324,7 @@ export function render() {
       <div class="q-shell" id="q-shell">
         <div class="q-main">
           <div class="card q-card">
-            ${premiseHTML(premise, null, { active: q.qNumber })}
+            ${premiseHTML(premise, null, { active: q.qNumber, progress: passageProgress(S.questions, S.i) })}
             <div class="q-ask">${rich(ask)}</div>
             <div class="opts" id="opts">
               ${q.options.map(o => optionRowHTML(o, { pickAct: 'practice-arm' })).join('')}
@@ -589,7 +589,7 @@ function paintResult(q, chosen, row, sched, ms) {
           ${radarHTML}
           ${(q.legalBasis || cleanSource) ? `
           <div class="fb-meta-strip">
-            ${q.legalBasis ? `<div class="fb-meta-item"><span class="fb-meta-label">Mevzuat</span><span class="fb-meta-val">${esc(q.legalBasis)}</span></div>` : ''}
+            ${q.legalBasis ? `<div class="fb-meta-item"><span class="fb-meta-label">Kural</span><span class="fb-meta-val">${esc(q.legalBasis)}</span></div>` : ''}
             ${cleanSource ? `<div class="fb-meta-item"><span class="fb-meta-label">Kaynak</span><span class="fb-meta-val">${esc(cleanSource)}</span></div>` : ''}
           </div>` : ''}
           <div class="kural-slot" id="kural-slot" hidden></div>

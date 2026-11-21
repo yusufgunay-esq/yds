@@ -88,6 +88,7 @@ export const questionsBySubject = new Map();
 export const questionsByTopic = new Map();
 export const questionById = new Map();
 export const questionsByTarget = new Map();
+export const passagesByKey = new Map();
 
 function push(map, key, val) {
   if (!map.has(key)) map.set(key, []);
@@ -259,6 +260,7 @@ export function populateData(vaultData) {
   questionsByTopic.clear();
   questionById.clear();
   questionsByTarget.clear();
+  passagesByKey.clear();
 
   TOPICS.sort((a, b) => (a.order || 0) - (b.order || 0));
 
@@ -273,7 +275,10 @@ export function populateData(vaultData) {
     if (q.topicId && topicById.has(q.topicId)) push(questionsByTopic, q.topicId, q);
     const target = q.examTarget || 'yds_core';
     push(questionsByTarget, target, q);
+    const pk = passageKey(q);
+    if (pk) push(passagesByKey, pk, q);
   });
+  passagesByKey.forEach(arr => arr.sort(byQNumber));
 
   return integrity();
 }
@@ -528,6 +533,28 @@ export function passageKey(q) {
 }
 
 const byQNumber = (a, b) => (a.qNumber || 0) - (b.qNumber || 0);
+
+/** Aynı parçaya bağlı tüm soruları kitapçık sırasıyla döndürür; parçasız soruda [q]. */
+export function passageSiblings(q) {
+  if (!q) return [];
+  const k = passageKey(q);
+  if (!k) return [q];
+  const group = passagesByKey.get(k);
+  return group && group.length ? group.slice() : [q];
+}
+
+/** Ardışık bir soru listesinde `idx` konumundaki sorunun parça içi sırası ({ idx, total }). */
+export function passageProgress(list, idx) {
+  if (!Array.isArray(list) || idx < 0 || idx >= list.length) return null;
+  const k = passageKey(list[idx]);
+  if (!k) return null;
+  let start = idx;
+  while (start > 0 && passageKey(list[start - 1]) === k) start--;
+  let end = idx;
+  while (end + 1 < list.length && passageKey(list[end + 1]) === k) end++;
+  const total = end - start + 1;
+  return total > 1 ? { idx: idx - start + 1, total } : null;
+}
 
 /**
  * Öncelik sırasıyla gelen havuzdan `want` soru seçer; parçalı sorularda
