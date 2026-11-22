@@ -17,14 +17,21 @@
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
 import { esc, rich, PASSAGE_PREFIX } from './ui.js';
+import { enhanceReadingHTML, highlightAnchorsHTML } from './adhd.js';
 
 /** YDS parçası: okuma ya da boşluk doldurma metni tek kartta. Cloze'da
- *  sorunun kendi boşluğu (active = soru no) vurgulanır. */
+ *  sorunun kendi boşluğu (active = soru no) vurgulanır; odak satırı açıkken
+ *  aktif boşluğu içeren cümle kendiliğinden öne çıkar. */
 function passageHTML(body, active, progress) {
   const cloze = /\(\d{1,2}\)\s*-{3,}/.test(body);
-  let html = body.split(/\n+/).map(p => p.trim()).filter(Boolean).map(p => `<p>${rich(p)}</p>`).join('');
+  const paras = body.split(/\n+/).map(p => p.trim()).filter(Boolean);
+  let html = paras.map((p, pi) => `<p>${enhanceReadingHTML(p, rich, { minRailLen: 90, startFocus: !cloze && pi === 0 })}</p>`).join('');
   if (cloze && active) {
     html = html.replace(`<span class="yds-blank" data-n="${active}">`, `<span class="yds-blank on" data-n="${active}">`);
+    html = html.replace(
+      new RegExp(`(<span class="adhd-sent)(" data-act="adhd-sent"[^>]*>(?:(?!</span>).)*?<span class="yds-blank on" data-n="${active}")`),
+      '$1 is-focus$2'
+    );
   }
   const head = cloze ? 'Parça · boşluk doldurma' : 'Okuma parçası';
   const step = progress && progress.total > 1 ? ` · ${progress.idx} / ${progress.total}` : '';
@@ -74,10 +81,10 @@ export function premiseHTML(premise, struckNumerals, opts = {}) {
       const isStruck = struckSet.has(m[1]);
       return `<div class="premise-item${isStruck ? ' struck' : ''}" data-act="eliminate-premise" data-numeral="${esc(m[1])}"
         title="Bu öncülü yanlış say (onu içeren şıklar otomatik elenir)">
-        <span class="premise-num">${esc(m[1])}.</span><span class="premise-txt">${rich(m[2])}</span>
+        <span class="premise-num">${esc(m[1])}.</span><span class="premise-txt">${highlightAnchorsHTML(rich(m[2]))}</span>
       </div>`;
     }
-    return `<div class="premise-lead">${rich(line)}</div>`;
+    return `<div class="premise-lead">${enhanceReadingHTML(line, rich)}</div>`;
   });
   return `<div class="q-premise">${items.join('')}</div>`;
 }

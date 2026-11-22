@@ -4,7 +4,7 @@
    Bu dosya YDS projesinin tescilli kaynak kodudur. İzinsiz kopyalama, türetme
    veya yeniden yayınlama yasaktır. Lisans: depo kökündeki LICENSE dosyası. */
 
-const VERSION = 'yds-v4';
+const VERSION = 'yds-v5';
 const SHELL = VERSION + '-shell';
 
 // Uygulamanın kendi dosyaları + dışarıdan gelen görünüm dosyaları + Stüdyo kabuğu.
@@ -23,6 +23,7 @@ const PRECACHE = [
   './studio/css/studio-mobile.css',
   './studio/css/notlar.css',
   './studio/js/main.js',
+  './studio/js/adhd.js',
   './studio/js/data.js',
   './studio/js/labels.js',
   './studio/js/engine.js',
