@@ -3263,6 +3263,7 @@ button.rv-stat.clickable:hover {
 .ak-sec-bas { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .ak-etiket { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-3); }
 .ak-cipler + .ak-basla, .ak-kartlar + .ak-etiket { margin-top: 0.85rem; }
+.ak-basla + .ak-sec-bas { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); }
 .ak-temizle { font-size: 0.8rem; color: var(--ink-3); padding: 0.1rem 0; transition: color .2s ease; }
 .ak-temizle:hover { color: var(--ink); }
 
@@ -3413,6 +3414,10 @@ button.rv-stat.clickable:hover {
   border-radius: var(--r-m);
 }
 .q-passage-k {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   font-family: var(--sans);
   font-size: 0.68rem;
   font-weight: 700;
@@ -3420,6 +3425,30 @@ button.rv-stat.clickable:hover {
   text-transform: uppercase;
   color: var(--ink-3);
   margin-bottom: 0.65rem;
+}
+.q-passage-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.q-passage-dots i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.q-passage-dots i.done { background: var(--ink-2); }
+.q-passage-dots i.cur { background: var(--accent); transform: scale(1.22); }
+.akim-same-passage .q-ask,
+.akim-same-passage .opts {
+  animation: akim-q-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes akim-q-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
 }
 .q-passage-body p {
   font-family: var(--serif);
@@ -3512,21 +3541,30 @@ button.rv-stat.clickable:hover {
   }
 }
 
-/* Geri sayım çipi: üstünde görünmez hedef sınav listesi */
-.countdown { position: relative; }
+/* Geri sayım çipi: üstünde hedef sınav seçici */
+.countdown { position: relative; display: inline-flex; align-items: center; gap: 0.3rem; }
 .countdown:has(.countdown-pick) { cursor: pointer; }
+.countdown-caret { width: 11px; height: 11px; opacity: 0.55; flex-shrink: 0; pointer-events: none; }
 .countdown-pick {
   position: absolute; inset: 0; width: 100%; height: 100%;
   opacity: 0; cursor: pointer; font-size: 16px; border: 0;
 }
 
-/* Telefonda parça soruları: önce soru, sonra parça, sonra şıklar. YDS'de
-   önerilen okuma sırası budur (neyi arayacağını bilerek oku); dar ekranda
-   soru, uzun parçanın altında kaybolmasın. */
+/* Telefonda parça soruları: önce soru, sonra kendi içinde kayan parça, sonra şıklar.
+   YDS'de önerilen okuma sırası budur (neyi arayacağını bilerek oku); parça ekranın
+   tamamını yutmadığı için şıklar ve bahis şeridi her zaman el altında kalır. */
 @media (max-width: 767px) {
   .q-card:has(> .q-passage),
   .wrap-read .card:has(> .q-passage) { display: flex; flex-direction: column; }
   .q-card:has(> .q-passage) > .q-ask,
   .wrap-read .card:has(> .q-passage) > .q-ask { order: -1; margin-bottom: 0.85rem; }
-  .q-passage { padding: 0.85rem 0.9rem 0.95rem; margin-left: -0.3rem; margin-right: -0.3rem; }
+  .q-passage {
+    padding: 0.85rem 0.95rem 0.95rem;
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    max-height: 36dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
 }

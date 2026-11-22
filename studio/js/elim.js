@@ -28,8 +28,12 @@ function passageHTML(body, active, progress) {
   }
   const head = cloze ? 'Parça · boşluk doldurma' : 'Okuma parçası';
   const step = progress && progress.total > 1 ? ` · ${progress.idx} / ${progress.total}` : '';
+  const dots = progress && progress.total > 1
+    ? `<span class="q-passage-dots" aria-hidden="true">${Array.from({ length: progress.total }, (_, i) =>
+        `<i class="${i + 1 === progress.idx ? 'cur' : (i + 1 < progress.idx ? 'done' : '')}"></i>`).join('')}</span>`
+    : '';
   return `<div class="q-passage${cloze ? ' is-cloze' : ''}">
-    <div class="q-passage-k">${head}${step}</div>
+    <div class="q-passage-k"><span>${head}${step}</span>${dots}</div>
     <div class="q-passage-body">${html}</div>
   </div>`;
 }

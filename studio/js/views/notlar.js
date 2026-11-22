@@ -140,7 +140,7 @@ function bas() {
     <h1 class="nt-title">Notlar</h1>
     <p class="nt-sub">${ui.mod === 'oku'
       ? 'En çok sorulan konular, sınav sırasıyla.'
-      : 'Dört sınav, 460 soru. Ne çıkıyor, nerede tuzak var, hangi sayı sorulur.'}</p>
+      : 'Beş sınav, 400 soru. Ne çıkıyor, nerede tuzak var, hangi kalıp sorulur.'}</p>
     ${seg()}
   </header>`;
 }

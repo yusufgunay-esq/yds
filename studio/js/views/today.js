@@ -9,7 +9,7 @@
 
 import { esc, $, pct } from '../ui.js';
 import { subjectName, topicById, aiQuestions, pastExamQuestions } from '../data.js';
-import { daysLeft, streak, lastExam, PASS_CORRECT, state, examDateLabel, EXAM_SESSION } from '../store.js';
+import { daysLeft, streak, lastExam, PASS_CORRECT, state, examDateLabel, EXAM_SESSION, upcomingSessions } from '../store.js';
 import { nextAction, srsSummary, allSubjectMastery,
   MASTERY_LABEL, bleedingTopics, bleedingTags, dueQuestions,
   examGap, worstExamSubjects, answerQualitySignals } from '../engine.js';
@@ -341,16 +341,24 @@ function sinavKarti(r) {
       <p class="hero-why" style="margin-bottom:0">Sınav bitti. Bu ekranın işi de bitti; emeğin kâğıtta.</p>
     </div>`;
   }
+  const nextSession = upcomingSessions().find(x => x.id !== EXAM_SESSION.id);
+  const switchRow = nextSession
+    ? `<div class="rota-foot" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap">
+         <span>Sıradaki oturuma hazırlanıyorsan hedef sınavı değiştirebilirsin.</span>
+         <button class="btn btn-2 btn-s" data-act="pick-exam-session" data-id="${esc(nextSession.id)}">${esc(nextSession.ad)} oturumuna geç</button>
+       </div>`
+    : '';
   return `
     <div class="hero rota-hero">
-      <div class="hero-kicker">Bugün</div>
+      <div class="hero-kicker">Bugün · ${esc(EXAM_SESSION.ad)}</div>
       <div class="hero-title">Sınav günü</div>
       <p class="hero-why">Bugün soru çözme; bildiğin yeterli. Aşağıdakiler dışında yapılacak iş yok.</p>
       <div class="rota">
         <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">Sınavdan önce erkenden binada ol</div><div class="rota-meta">Sınav 10.15'te başlıyor. Giriş saatini giriş belgendeki bilgiden bir kez daha kontrol et.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
         <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">Sabah son bakış: hap bilgiler</div><div class="rota-meta">Notlar içinde Oku sekmesindeki kartlara hızlıca bak. En fazla 20 dakika; yeni konu açma.</div></div><div class="rota-count"></div><div class="rota-act"><button class="btn btn-2 btn-s" data-view="notlar">Aç</button></div></div>
         <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">Kimlik ve sınava giriş belgesi</div><div class="rota-meta">Çıkmadan önce bir kez daha kontrol et.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
-        <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">80 soru · 180 dakika</div><div class="rota-meta">Soru başına ~135 saniye.  Takıldığını işaretle geç, ikinci turda dön; boş bırakma.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
+        <div class="rota-row todo"><span class="rota-dot"></span><div class="rota-main"><div class="rota-name">80 soru · 180 dakika</div><div class="rota-meta">Soru başına ~135 saniye. Takıldığını işaretle geç, ikinci turda dön; boş bırakma.</div></div><div class="rota-count"></div><div class="rota-act"></div></div>
+        ${switchRow}
       </div>
     </div>`;
 }

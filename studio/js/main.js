@@ -488,6 +488,10 @@ document.addEventListener('click', async e => {
       break;
     }
 
+    case 'pick-exam-session':
+      if (el.dataset.id) { setExamSession(el.dataset.id); location.reload(); }
+      break;
+
     default: break;
   }
 });
@@ -510,11 +514,14 @@ function renderCountdown() {
   const d = daysLeft();
   const ups = upcomingSessions();
   const label = d > 0 ? `Sınava <b>${d} gün</b>` : '<b>Sınav günü</b>';
+  const caret = ups.length > 1
+    ? `<svg class="countdown-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+    : '';
   const pick = ups.length > 1
     ? `<select class="countdown-pick" data-act="exam-session" aria-label="Hedef sınav">${ups.map(x =>
         `<option value="${x.id}"${x.id === EXAM_SESSION.id ? ' selected' : ''}>${x.ad} · ${examDateLabel(new Date(x.at))}</option>`).join('')}</select>`
     : '';
-  cd.innerHTML = label + pick;
+  cd.innerHTML = label + caret + pick;
   cd.title = `${EXAM_SESSION.ad} · ${examDateLabel()} · 10.15`;
 }
 

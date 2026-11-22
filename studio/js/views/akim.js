@@ -146,6 +146,11 @@ export function render() {
   const q = A.queue[0];
   const { premise, ask } = splitStem(q.stem);
   const topic = q.topicId ? topicById.get(q.topicId) : null;
+  const curPk = passageKey(q);
+  const samePassage = !!(curPk && A.lastPassageKey && curPk === A.lastPassageKey);
+  const prevPassageEl = host.querySelector('.q-passage');
+  const savedScroll = samePassage && prevPassageEl ? prevPassageEl.scrollTop : 0;
+  A.lastPassageKey = curPk;
   // 20 Eylül 2026: flowScore göstergesi ve ona bağlı otomatik mola kaldırıldı.
   // Gösterge doğruluğu yargılıyordu: ilk denemede %55 isabetle ekran çoğu
   // zaman "Isınıyor / Mola ver" yazıyor, üstüne "iki cevap arası ≤ 8 sn"
@@ -180,7 +185,7 @@ export function render() {
 
       <div class="q-shell" id="q-shell">
         <div class="q-main">
-          <div class="card q-card akim-card">
+          <div class="card q-card akim-card${samePassage ? ' akim-same-passage' : ''}">
             ${premiseHTML(premise, null, { active: q.qNumber, progress: akimPassageProgress(q) })}
             <div class="q-ask">${rich(ask)}</div>
             <div class="opts" id="opts">
@@ -211,6 +216,17 @@ export function render() {
         <aside class="q-side"><div id="fb"></div></aside>
       </div>
     </div>`;
+
+  // Parça okuma konumu: aynı parçada okuma yerini koru; cloze'da aktif boşluğu görünür alana getir.
+  const newPassage = host.querySelector('.q-passage');
+  if (newPassage) {
+    const activeBlank = newPassage.querySelector('.yds-blank.on');
+    if (activeBlank && typeof activeBlank.scrollIntoView === 'function') {
+      try { activeBlank.scrollIntoView({ block: 'center', behavior: 'instant' }); } catch (_) {}
+    } else if (samePassage && savedScroll > 0) {
+      newPassage.scrollTop = savedScroll;
+    }
+  }
 
   if (!A.answered) {
     /* أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ · بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ · رَبِّ يَسِّرْ وَلَا تُعَسِّرْ رَبِّ تَمِّمْ بِالْخَيْرِ */
@@ -387,17 +403,17 @@ function dersSeciciHTML(kapanis = false) {
   };
 
   return `<section class="ak-sec${kapanis ? ' kapanis' : ''}">
+    <div class="ak-basla">
+      <button class="btn akim-go" data-act="akim-start">${esc(baslat)}</button>
+      <span class="ak-basla-not">${n ? 'Yalnız seçtiğin dersler gelir.' : 'Seçmezsen bütün dersler karışık gelir.'}</span>
+    </div>
     <div class="ak-sec-bas">
-      <span class="ak-etiket">Eksiğin burada</span>
+      <span class="ak-etiket">Eksiğin burada · istersen ders seç</span>
       ${n ? `<button class="ak-temizle" data-act="akim-ders-temizle">Seçimi kaldır</button>` : ''}
     </div>
     <div class="ak-kartlar">${rows.filter(r => r.eksik).map(kart).join('')}</div>
     <span class="ak-etiket">Diğer dersler</span>
     <div class="ak-cipler">${rows.filter(r => !r.eksik).map(cip).join('')}</div>
-    <div class="ak-basla">
-      <button class="btn akim-go" data-act="akim-start">${esc(baslat)}</button>
-      <span class="ak-basla-not">${n ? 'Yalnız seçtiğin dersler gelir.' : 'Seçmezsen bütün dersler karışık gelir.'}</span>
-    </div>
   </section>`;
 }
 
